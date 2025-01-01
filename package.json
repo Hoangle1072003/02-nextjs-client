@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "devs": "next dev --turbopack",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -11,7 +12,13 @@
   "dependencies": {
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "next": "15.1.3"
+    "next": "15.1.3",
+    "@reduxjs/toolkit": "^2.5.0",
+    "next-auth": "5.0.0-beta.25",
+    "query-string": "9.1.0",
+    "react-redux": "^9.2.0",
+    "swr": "^2.3.0",
+    "axios": "^1.7.9"
   },
   "devDependencies": {
     "typescript": "^5",
