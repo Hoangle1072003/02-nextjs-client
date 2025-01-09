@@ -28,6 +28,7 @@ declare global {
         };
         result: T[];
     }
+
     interface ILogin {
         user: {
             id: string;
@@ -42,4 +43,22 @@ declare global {
         };
         access_token: string;
     }
+
+    // >>>>>>>>>> start of product >>>>>>>>>>>>>
+    interface IProduct {
+        id: string;
+        name: string;
+        image: string;
+        varients: IProductVariant[];
+    }
+
+    interface IProductVariant {
+        id: string;
+        name: string;
+        price: number;
+    }
+
+
+    // >>>>>>>>>> end of product >>>>>>>>>>>>>
+
 }

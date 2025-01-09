@@ -1,3 +1,4 @@
+// app/(home)/layout.tsx
 import {Layout} from "antd";
 import React from "react";
 import AppHeader from "@/components/layout/app.header";
@@ -10,15 +11,18 @@ type AppLayoutProps = {
 
 const AppLayout: React.FC<AppLayoutProps> = ({children}) => {
     return (
-        <Layout style={{
-            minHeight: "100vh",
-            width: "100%",
-        }}>
-
+        <Layout>
             <AppHeader/>
-            <AppContent>
-                {children}
-            </AppContent>
+            <Layout
+                style={{
+                    width: "1440px",
+                    margin: "24px auto",
+                    maxWidth: "1440px",
+                    minHeight: "100vh",
+                }}
+            >
+                <AppContent>{children}</AppContent>
+            </Layout>
             <AppFooter/>
         </Layout>
     );
