@@ -4,6 +4,7 @@ import React from "react";
 import AppHeader from "@/components/layout/app.header";
 import AppFooter from "@/components/layout/app.footer";
 import AppContent from "@/components/layout/app.content";
+import AppContainer from "@/components/layout/app.container";
 
 type AppLayoutProps = {
     children: React.ReactNode;

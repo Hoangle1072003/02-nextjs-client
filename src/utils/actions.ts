@@ -23,3 +23,20 @@
 //         }
 //     }
 // }
+
+import {sendRequest} from "@/utils/api";
+
+export async function ProductDetailsById(productId: string) {
+    const temp = productId.replace(".html", "");
+
+    const parts = temp.split("-");
+
+    const id = parts.at(-1);
+
+    const res = await sendRequest({
+        url: `http://localhost:8083/api/v1/products/${id}`,
+        method: "GET",
+    })
+
+    return res;
+}

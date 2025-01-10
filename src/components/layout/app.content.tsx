@@ -10,9 +10,7 @@ const AppContent: React.FC<AppContentProps> = ({children}) => {
     const {Content} = Layout;
     return (
         <>
-            <Content style={{
-                overflow: "initial",
-            }}>
+            <Content>
                 <AppContainer>
                     {children}
                 </AppContainer>

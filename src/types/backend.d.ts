@@ -48,7 +48,6 @@ declare global {
     interface IProduct {
         id: string;
         name: string;
-        image: string;
         varients: IProductVariant[];
     }
 
@@ -56,6 +55,8 @@ declare global {
         id: string;
         name: string;
         price: number;
+        image: string;
+
     }
 
 

@@ -20,7 +20,7 @@ const ProductList = ({data}: { data: IProduct[] }) => {
                         xl={4}
                         key={index}
                     >
-                        <Link href={`/${converSlugUrl(_.name)}-${_.id}.html`}
+                        <Link href={`/product/${converSlugUrl(_.name)}-${_.id}.html`}
                               passHref={true}
                         >
                             <Card
@@ -33,44 +33,24 @@ const ProductList = ({data}: { data: IProduct[] }) => {
                                     flexDirection: "column",
                                     height: "100%",
                                     justifyContent: "space-between",
-                                    transition: "all 0.3s ease-in-out",
-                                }}
+                                }}>
+                                <div
+                                    style={{
+                                        textAlign: "center",
+                                        padding: "10px",
+                                        position: "relative",
+                                        overflow: "hidden",
+                                    }}
+                                >
+                                    <Image
+                                        src={_.varients[0].image}
+                                        alt={_.name}
+                                        width={120}
+                                        height={120}
 
-                                onMouseEnter={(e) => {
-                                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0, 0, 0, 0.2)"; // Hover tăng shadow
-                                }}
-                                onMouseLeave={(e) => {
-                                    e.currentTarget.style.boxShadow = "0 2px 8px rgba(0, 0, 0, 0.1)";
-                                }}
-                                cover={
-                                    <div
-                                        style={{
-                                            textAlign: "center",
-                                            background: "#f9f9f9",
-                                            padding: "10px",
-                                            position: "relative",
-                                            overflow: "hidden",
-                                        }}
-                                    >
-                                        <Image
-                                            src={_.image}
-                                            alt={_.name}
-                                            width={120}
-                                            height={120}
-                                            style={{
-                                                objectFit: "cover",
-                                                transition: "transform 0.3s ease-in-out",
-                                            }}
-                                            onMouseEnter={(e) => {
-                                                e.currentTarget.style.transform = "scale(1.1)";
-                                            }}
-                                            onMouseLeave={(e) => {
-                                                e.currentTarget.style.transform = "scale(1)";
-                                            }}
-                                        />
-                                    </div>
-                                }
-                            >
+                                    />
+                                </div>
+
                                 {/* Khu vực tên sản phẩm */}
                                 <Tooltip title={_.name}>
                                     <div
