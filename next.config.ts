@@ -9,6 +9,12 @@ const nextConfig: NextConfig = {
                 port: '',
                 search: '',
             },
+            {
+                protocol: 'https',
+                hostname: 'picsum.photos',
+                port: '',
+                search: '',
+            },
         ],
     },
 };

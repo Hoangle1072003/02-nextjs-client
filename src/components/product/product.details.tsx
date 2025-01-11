@@ -57,9 +57,8 @@ const ProductDetails = ({data}: { data: any }) => {
                                 <Image
                                     src={selectedVariant.image}
                                     alt={data.name}
-                                    width={100}
-                                    height={100}
-                                    layout="responsive"
+                                    width={200}
+                                    height={300}
                                 />
                             }
                         />
@@ -301,7 +300,7 @@ const ProductDetails = ({data}: { data: any }) => {
                                             lineHeight: "150%",
                                         }}
                                     >
-                                        {selectedVariant.price}đ
+                                        {selectedVariant.price * quantity}đ
                                     </p>
                                 </div>
                             </div>
