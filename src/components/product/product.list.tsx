@@ -1,17 +1,37 @@
 "use client";
 import AppCarousel from "@/components/layout/app.carousel";
-import {Card, Col, Row, Tooltip} from "antd";
+import {Card, Col, Row, Skeleton, Tooltip} from "antd";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {converSlugUrl} from "@/utils/api";
+import useSWR from "swr";
 
-const ProductList = ({data}: { data: IProduct[] }) => {
+const ProductList = () => {
+    const fetcher = (url: string) => fetch(url).then((r) => r.json());
+    const {data, error, isLoading} = useSWR("http://localhost:8083/api/v1/products", fetcher, {
+        revalidateIfStale: false,
+        revalidateOnFocus: false,
+        revalidateOnReconnect: false
+    });
+
+    if (isLoading) {
+        return <Skeleton/>;
+    }
+
+    if (error) {
+        return <div>Error loading products.</div>;
+    }
+
+    if (!data || !data.data || data.data.length === 0) {
+        return <div>No products available.</div>;
+    }
+
     return (
         <>
             <AppCarousel/>
             <Row gutter={[16, 16]} justify="start">
-                {data.map((_, index) => (
+                {data.data.map((product, index) => (
                     <Col
                         xs={24}
                         sm={12}
@@ -20,8 +40,9 @@ const ProductList = ({data}: { data: IProduct[] }) => {
                         xl={4}
                         key={index}
                     >
-                        <Link href={`/product/${converSlugUrl(_.name)}-${_.id}.html`}
-                              passHref={true}
+                        <Link
+                            href={`/product/${converSlugUrl(product.name)}-${product.id}.html`}
+                            passHref={true}
                         >
                             <Card
                                 hoverable
@@ -33,7 +54,8 @@ const ProductList = ({data}: { data: IProduct[] }) => {
                                     flexDirection: "column",
                                     height: "100%",
                                     justifyContent: "space-between",
-                                }}>
+                                }}
+                            >
                                 <div
                                     style={{
                                         textAlign: "center",
@@ -43,16 +65,15 @@ const ProductList = ({data}: { data: IProduct[] }) => {
                                     }}
                                 >
                                     <Image
-                                        src={_.varients[0].image}
-                                        alt={_.name}
+                                        src={product.varients[0].image}
+                                        alt={product.name}
                                         width={120}
                                         height={120}
-
                                     />
                                 </div>
 
-                                {/* Khu vực tên sản phẩm */}
-                                <Tooltip title={_.name}>
+                                {/* Product Name */}
+                                <Tooltip title={product.name}>
                                     <div
                                         style={{
                                             fontSize: "13px",
@@ -66,11 +87,11 @@ const ProductList = ({data}: { data: IProduct[] }) => {
                                             minHeight: "40px",
                                         }}
                                     >
-                                        {_.name}
+                                        {product.name}
                                     </div>
                                 </Tooltip>
 
-                                {/* Khu vực giá */}
+                                {/* Product Price */}
                                 <div
                                     style={{
                                         textAlign: "left",
@@ -82,7 +103,7 @@ const ProductList = ({data}: { data: IProduct[] }) => {
                                     {new Intl.NumberFormat("vi-VN", {
                                         style: "currency",
                                         currency: "VND",
-                                    }).format(_.varients[0].price)}
+                                    }).format(product.varients[0].price)}
                                 </div>
                             </Card>
                         </Link>

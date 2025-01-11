@@ -62,4 +62,10 @@ declare global {
 
     // >>>>>>>>>> end of product >>>>>>>>>>>>>
 
+    // >>>>>>>>>> start of category >>>>>>>>>>>>>
+    interface ICategory{
+        id: string;
+        name: string;
+    }
+    // >>>>>>>>>> end of category >>>>>>>>>>>>>
 }

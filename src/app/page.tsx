@@ -1,6 +1,7 @@
 import AppPage from "@/app/(home)/page";
 
-const Home = () => {
+const Home = async () => {
+   
     return (
         <>
             <AppPage/>

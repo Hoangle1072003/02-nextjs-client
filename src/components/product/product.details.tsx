@@ -35,12 +35,13 @@ const ProductDetails = ({data}: { data: any }) => {
 
     return (
         <>
-            <Breadcrumb>
-                <Breadcrumb.Item>
-                    <Link href="/">Trang chủ</Link>
-                </Breadcrumb.Item>
-                <Breadcrumb.Item>{productName}</Breadcrumb.Item>
-            </Breadcrumb>
+            <Breadcrumb
+                items={[
+                    {title: <Link href="/">Trang chủ</Link>},
+                    {title: productName},
+                ]}
+            />
+
             <Layout style={{padding: "20px"}}>
                 <Row gutter={[16, 16]}>
                     {/* Product Image Column */}

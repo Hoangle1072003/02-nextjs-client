@@ -5,20 +5,25 @@ import {sendRequest} from "@/utils/api";
 import AppSider from "@/components/layout/app.sider";
 import {Content} from "antd/es/layout/layout";
 import AppLayout from "@/app/(home)/layout";
+import {CategoryList} from "@/utils/actions";
+
 
 const AppPage = async () => {
     const res = await sendRequest<IBackendRes<IProduct[]>>({
-        url: "http://localhost:8083/api/v1/products",
+        url: `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products`,
         method: "GET",
     });
     const products = res.data || [];
+    const categories = await CategoryList();
     return (
         <>
             <AppLayout>
                 <Layout style={{display: "flex", flexDirection: "row"}}>
-                    <AppSider/>
+                    <AppSider
+                        categories={categories.data || []}
+                    />
                     <Content>
-                        <ProductList data={products}/>
+                        <ProductList/>
                     </Content
                     >
                 </Layout>

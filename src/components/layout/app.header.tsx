@@ -1,14 +1,52 @@
 "use client";
 
-import {Layout, Input, Badge, Tooltip} from "antd";
+import {Layout, Input, Badge, Tooltip, Dropdown, MenuProps} from "antd";
 import React from "react";
 import Image from "next/image";
 import {HomeOutlined, UserOutlined, ShoppingCartOutlined, SearchOutlined} from "@ant-design/icons";
 import Link from "next/link";
 import AppContainer from "@/components/layout/app.container";
+import {signOut} from "next-auth/react";
 
-const AppHeader = () => {
+const AppHeader = (prop: any) => {
     const {Header} = Layout;
+    const {session} = prop;
+
+
+    const items: MenuProps['items'] = [
+        {
+            label: (
+                <Link href={"/"}>
+                    Thông tin tài khoản
+                </Link>
+            ),
+            key: '0',
+        },
+        {
+            label: (
+                <Link href={"/"}>
+                    Đơn hàng của tôi
+                </Link>
+            ),
+            key: '1',
+        },
+        {
+            type: 'divider',
+        },
+        {
+            label: session ? (
+                <div onClick={() => signOut()} style={{cursor: "pointer"}}>
+                    Đăng xuất
+                </div>
+            ) : (
+                <Link href="/auth/login">
+                    Đăng nhập
+                </Link>
+            ),
+            key: '3',
+        }
+    ];
+
 
     return (
         <Header
@@ -88,17 +126,19 @@ const AppHeader = () => {
 
                         {/* Account */}
                         <Tooltip title="Tài khoản">
-                            <div
-                                style={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    cursor: "pointer",
-                                    gap: "4px",
-                                }}
-                            >
-                                <UserOutlined style={{fontSize: "20px", color: "#555"}}/>
-                                <div style={{fontSize: "12px", color: "#555"}}>Tài khoản</div>
-                            </div>
+                            <Dropdown menu={{items}}>
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        cursor: "pointer",
+                                        gap: "4px",
+                                    }}
+                                >
+                                    <UserOutlined style={{fontSize: "20px", color: "#555"}}/>
+                                    <div style={{fontSize: "12px", color: "#555"}}>Tài khoản</div>
+                                </div>
+                            </Dropdown>
                         </Tooltip>
 
                         {/* Cart */}
