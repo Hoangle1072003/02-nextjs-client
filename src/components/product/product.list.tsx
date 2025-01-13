@@ -31,7 +31,7 @@ const ProductList = () => {
         <>
             <AppCarousel/>
             <Row gutter={[16, 16]} justify="start">
-                {data.data.map((product, index) => (
+                {data.data.map((product: IProduct, index: number) => (
                     <Col
                         xs={24}
                         sm={12}
