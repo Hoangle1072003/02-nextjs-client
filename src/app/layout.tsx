@@ -4,6 +4,7 @@ import "./globals.css";
 import {SWRConfig} from "swr";
 import {AntdRegistry} from "@ant-design/nextjs-registry";
 import NextAuthWrapper from "@/lib/next.auth.wrapper";
+import StoreProvider from "@/app/StoreProvider";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -29,13 +30,13 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable}`}>
-        {/*<StoreProvider>*/}
-        <SWRConfig>
-            <AntdRegistry>
-                <NextAuthWrapper>{children}</NextAuthWrapper>
-            </AntdRegistry>
-        </SWRConfig>
-        {/*</StoreProvider>*/}
+        <StoreProvider>
+            <SWRConfig>
+                <AntdRegistry>
+                    <NextAuthWrapper>{children}</NextAuthWrapper>
+                </AntdRegistry>
+            </SWRConfig>
+        </StoreProvider>
         </body>
         </html>
     );

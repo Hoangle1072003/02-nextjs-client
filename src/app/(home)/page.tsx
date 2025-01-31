@@ -12,6 +12,7 @@ const AppPage = async () => {
     const res = await sendRequest<IBackendRes<IProduct[]>>({
         url: `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products`,
         method: "GET",
+
     });
     const products = res.data || [];
     const categories = await CategoryList();
