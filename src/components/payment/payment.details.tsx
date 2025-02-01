@@ -9,6 +9,7 @@ import {
   Skeleton,
 } from "antd";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
@@ -24,7 +25,7 @@ interface IProps {
 }
 const PaymentDetails = (props: IProps) => {
   const { user } = props;
-
+  const router = useRouter();
   const [value, setValue] = useState<"COD" | "VNPAY">("COD");
   const [order, setOrder] = useState({});
   const [loading, setLoading] = useState(false);
@@ -32,7 +33,6 @@ const PaymentDetails = (props: IProps) => {
   const onChange = (e: RadioChangeEvent) => {
     const selectedValue = e.target.value === 1 ? "COD" : "VNPAY";
     setValue(selectedValue);
-    console.log(selectedValue);
   };
 
   const fetcher = (url: string) => {
@@ -65,12 +65,44 @@ const PaymentDetails = (props: IProps) => {
     }).then((res) => res.json());
   };
 
-  const { trigger } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/order`,
+  const sendPayment = async (url: string, { arg }: { arg: any }) => {
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${props?.session?.user?.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(arg),
+    });
+
+    return await res.json();
+  };
+
+  const { trigger: triggerPayment, isMutating: isPaymentMutating } =
+    useSWRMutation(
+      `${process.env.NEXT_PUBLIC_API_URL}payment-service/api/v1/payment/find-payment-by-user-id`,
+      sendPayment,
+      {
+        onSuccess: (data) => {
+          console.log(">>>>>data", data);
+          if (data?.data?.paymentUrl) {
+            router.push(data?.data?.paymentUrl);
+          }
+        },
+        onError: (err) => {
+          console.log(">>>>>err", err);
+        },
+      }
+    );
+
+  const { trigger: triggerOrder, isMutating: isOrderMutating } = useSWRMutation(
+    `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders`,
     sendOrder,
     {
       onSuccess: (data) => {
-        console.log(">>>>>data", data);
+        console.log("Payment data:", data);
+        if (data?.data?.paymentUrl) {
+        }
       },
       onError: (err) => {
         console.log(">>>>>err", err);
@@ -86,21 +118,27 @@ const PaymentDetails = (props: IProps) => {
   }
 
   const handleOrder = async () => {
-    setLoading(true);
+    setLoading(true); // Start loading
+
+    // Prepare order data
     const newOrder = {
       userId: props?.session?.user?.id,
       cartId: cartUserId?.data?.id,
-      shipping: user?.address,
+      shipping: user?.address || "Chưa cập nhật địa chỉ",
       paymentMethod: value,
     };
 
     setOrder(newOrder);
 
-    setTimeout(() => {
-      setLoading(false);
-      trigger({ arg: newOrder });
-      console.log(">>>>>order", newOrder);
-    }, 2000);
+    triggerOrder({ arg: newOrder });
+
+    // if (!isOrderMutating) {
+    const paymentData = {
+      orderId: "679b6212128e9a5e3e974760",
+      userId: "5a217b06-27b8-4ee9-a9fe-297a9c1c39a4",
+    };
+    triggerPayment(paymentData);
+    // }
   };
 
   return (
