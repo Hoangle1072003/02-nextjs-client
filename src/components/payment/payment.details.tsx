@@ -7,6 +7,7 @@ import {
   RadioChangeEvent,
   Row,
   Skeleton,
+  message,
 } from "antd";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -29,7 +30,7 @@ const PaymentDetails = (props: IProps) => {
   const [value, setValue] = useState<"COD" | "VNPAY">("COD");
   const [order, setOrder] = useState({});
   const [loading, setLoading] = useState(false);
-
+  const [messageApi, contextHolder] = message.useMessage();
   const onChange = (e: RadioChangeEvent) => {
     const selectedValue = e.target.value === 1 ? "COD" : "VNPAY";
     setValue(selectedValue);
@@ -55,14 +56,16 @@ const PaymentDetails = (props: IProps) => {
   );
 
   const sendOrder = async (url: string, { arg }: { arg: any }) => {
-    return fetch(url, {
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${props?.session?.user?.access_token}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(arg),
-    }).then((res) => res.json());
+    });
+
+    return await res.json();
   };
 
   const sendPayment = async (url: string, { arg }: { arg: any }) => {
@@ -95,16 +98,22 @@ const PaymentDetails = (props: IProps) => {
       }
     );
 
-  const { trigger: triggerOrder, isMutating: isOrderMutating } = useSWRMutation(
-    `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders`,
+  const { trigger: triggerOrder } = useSWRMutation(
+    `http://localhost:9191/order-service/api/v1/orders`,
     sendOrder,
     {
       onSuccess: (data) => {
-        console.log("Payment data:", data);
-        if (data?.data?.paymentUrl) {
-        }
+        messageApi.open({
+          type: "success",
+          content: "Đặt hàng thành công",
+        });
+        console.log("Order data", data);
       },
       onError: (err) => {
+        messageApi.open({
+          type: "error",
+          content: "Đặt hàng thất bại",
+        });
         console.log(">>>>>err", err);
       },
     }
@@ -118,9 +127,17 @@ const PaymentDetails = (props: IProps) => {
   }
 
   const handleOrder = async () => {
-    setLoading(true); // Start loading
+    setLoading(true);
 
-    // Prepare order data
+    if (!cartUserId || !cartUserId?.data?.id) {
+      messageApi.open({
+        type: "error",
+        content: "Chưa có giỏ hàng, vui lòng thử lại.",
+      });
+      setLoading(false);
+      return;
+    }
+
     const newOrder = {
       userId: props?.session?.user?.id,
       cartId: cartUserId?.data?.id,
@@ -128,21 +145,25 @@ const PaymentDetails = (props: IProps) => {
       paymentMethod: value,
     };
 
-    setOrder(newOrder);
+    if (value === "VNPAY") {
+      console.log("cartUserId", cartUserId);
+      setOrder(newOrder);
+      console.log(newOrder);
 
-    triggerOrder({ arg: newOrder });
-
-    // if (!isOrderMutating) {
-    const paymentData = {
-      orderId: "679b6212128e9a5e3e974760",
-      userId: "5a217b06-27b8-4ee9-a9fe-297a9c1c39a4",
-    };
-    triggerPayment(paymentData);
-    // }
+      triggerOrder({ arg: newOrder });
+    } else {
+      console.log("COD selected");
+      messageApi.open({
+        type: "error",
+        content: "Chức năng COD đang phát triển, vui lòng chọn VNPAY",
+      });
+    }
+    setLoading(false);
   };
 
   return (
     <>
+      {contextHolder}
       <Row gutter={[16, 16]}>
         <Col span={17}>
           <Card
@@ -372,7 +393,7 @@ const PaymentDetails = (props: IProps) => {
 
             <Button
               loading={loading}
-              onClick={handleOrder}
+              onClick={() => handleOrder()}
               type="primary"
               style={{
                 width: "100%",
