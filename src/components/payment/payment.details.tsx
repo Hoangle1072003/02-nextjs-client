@@ -27,12 +27,12 @@ interface IProps {
 const PaymentDetails = (props: IProps) => {
   const { user } = props;
   const router = useRouter();
-  const [value, setValue] = useState<"COD" | "VNPAY">("COD");
+  const [value, setValue] = useState<"COD" | "VNPay">("COD");
   const [order, setOrder] = useState({});
   const [loading, setLoading] = useState(false);
   const [messageApi, contextHolder] = message.useMessage();
   const onChange = (e: RadioChangeEvent) => {
-    const selectedValue = e.target.value === 1 ? "COD" : "VNPAY";
+    const selectedValue = e.target.value === 1 ? "COD" : "VNPay";
     setValue(selectedValue);
   };
 
@@ -53,70 +53,6 @@ const PaymentDetails = (props: IProps) => {
       ? `${process.env.NEXT_PUBLIC_API_URL}cart-service/api/v1/cart/user/${props?.session?.user?.id}`
       : null,
     fetcher
-  );
-
-  const sendOrder = async (url: string, { arg }: { arg: any }) => {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${props?.session?.user?.access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(arg),
-    });
-
-    return await res.json();
-  };
-
-  const sendPayment = async (url: string, { arg }: { arg: any }) => {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${props?.session?.user?.access_token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(arg),
-    });
-
-    return await res.json();
-  };
-
-  const { trigger: triggerPayment, isMutating: isPaymentMutating } =
-    useSWRMutation(
-      `${process.env.NEXT_PUBLIC_API_URL}payment-service/api/v1/payment/find-payment-by-user-id`,
-      sendPayment,
-      {
-        onSuccess: (data) => {
-          console.log(">>>>>data", data);
-          if (data?.data?.paymentUrl) {
-            router.push(data?.data?.paymentUrl);
-          }
-        },
-        onError: (err) => {
-          console.log(">>>>>err", err);
-        },
-      }
-    );
-
-  const { trigger: triggerOrder } = useSWRMutation(
-    `http://localhost:9191/order-service/api/v1/orders`,
-    sendOrder,
-    {
-      onSuccess: (data) => {
-        messageApi.open({
-          type: "success",
-          content: "Đặt hàng thành công",
-        });
-        console.log("Order data", data);
-      },
-      onError: (err) => {
-        messageApi.open({
-          type: "error",
-          content: "Đặt hàng thất bại",
-        });
-        console.log(">>>>>err", err);
-      },
-    }
   );
 
   if (cartUserIdError) {
@@ -145,20 +81,67 @@ const PaymentDetails = (props: IProps) => {
       paymentMethod: value,
     };
 
-    if (value === "VNPAY") {
-      console.log("cartUserId", cartUserId);
-      setOrder(newOrder);
-      console.log(newOrder);
+    if (value === "VNPay") {
+      try {
+        setOrder(newOrder);
 
-      triggerOrder({ arg: newOrder });
+        const orderRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${props?.session?.user?.access_token}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(newOrder),
+          }
+        );
+
+        const orderData = await orderRes.json();
+        console.log("Order data", orderData?.data?.id);
+
+        if (orderData?.data) {
+          const paymentRes = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}payment-service/api/v1/payment/find-payment-by-user-id`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${props?.session?.user?.access_token}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                userId: props?.session?.user?.id,
+                orderId: orderData?.data?.id,
+              }),
+            }
+          );
+
+          const paymentData = await paymentRes.json();
+          console.log("Full Payment API response", paymentData);
+
+          if (paymentData?.data?.paymentUrl) {
+            router.push(paymentData?.data?.paymentUrl);
+          }
+        }
+      } catch (error) {
+        console.error("Error:", error);
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 3000);
+      }
     } else {
+      setLoading(true);
       console.log("COD selected");
-      messageApi.open({
-        type: "error",
-        content: "Chức năng COD đang phát triển, vui lòng chọn VNPAY",
-      });
+
+      setTimeout(() => {
+        setLoading(false);
+        messageApi.open({
+          type: "error",
+          content: "Chức năng COD đang phát triển, vui lòng chọn VNPAY",
+        });
+      }, 2000);
     }
-    setLoading(false);
   };
 
   return (

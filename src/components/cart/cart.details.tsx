@@ -11,34 +11,28 @@ import {
   InputNumber,
   Skeleton,
   Empty,
+  message,
+  Image,
+  Popconfirm,
 } from "antd";
-import { DeleteOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import { DeleteOutlined } from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
-import { log } from "console";
 
-const CheckboxGroup = Checkbox.Group;
-
-interface IProps {
-  session: any;
-}
-
-const CartDetails = (props: IProps) => {
-  const { session } = props;
+const CartDetails = ({ session }) => {
   const router = useRouter();
-  const fetcher = (url: string) => {
-    return fetch(url, {
-      headers: {
-        Authorization: `Bearer ${session?.user?.access_token}`,
-      },
+  const [loading, setLoading] = useState(false);
+  const fetcher = (url) =>
+    fetch(url, {
+      headers: { Authorization: `Bearer ${session?.user?.access_token}` },
     }).then((res) => res.json());
-  };
-
+  const [messageApi, contextHolder] = message.useMessage();
   const {
     data: cartDetails,
-    error: cartError,
-    isLoading: cartLoading,
+    error,
+    isLoading,
+    mutate,
   } = useSWR(
     session?.user?.id
       ? `${process.env.NEXT_PUBLIC_API_URL}cart-service/api/v1/cart-item/${session?.user?.id}`
@@ -46,188 +40,260 @@ const CartDetails = (props: IProps) => {
     fetcher
   );
 
-  const [checkedList, setCheckedList] = useState<string[]>([]);
+  const [checkedList, setCheckedList] = useState([]);
+  const [cartData, setCartData] = useState(cartDetails);
 
-  const onChange = (list: string[]) => {
-    setCheckedList(list);
+  useEffect(
+    () => setCartData(cartDetails),
+
+    [cartDetails]
+  );
+
+  const handleQuantityChange = async (
+    productId: string,
+    variantId: string,
+    newQuantity: number
+  ) => {
+    const previousCart = { ...cartData };
+    setCartData((prev) => ({
+      ...prev,
+      data: {
+        ...prev.data,
+        products: prev.data.products.map((item) =>
+          item.productId === productId
+            ? {
+                ...item,
+                varients: [{ ...item.varients[0], quantity: newQuantity }],
+              }
+            : item
+        ),
+      },
+    }));
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}cart-service/api/v1/cart-item/update-quantity`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session?.user?.access_token}`,
+          },
+          body: JSON.stringify({
+            userId: session.user.id,
+            productId,
+            variantId,
+            quantity: newQuantity,
+          }),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update quantity");
+      mutate();
+    } catch (error) {
+      messageApi.open({
+        type: "error",
+        content: "Không thể cập nhật số lượng",
+      });
+      setCartData(previousCart);
+    }
   };
 
-  const indeterminate =
-    checkedList.length > 0 &&
-    checkedList.length < cartDetails?.data?.products.length;
-
-  if (cartError) {
-    return <div>Failed to load cart details</div>;
-  }
-
-  if (cartLoading) {
-    return <Skeleton active />;
-  }
-
-  if (!cartDetails?.data) {
+  if (error) return <div>Failed to load cart details</div>;
+  if (isLoading) return <Skeleton active />;
+  if (!cartData?.data)
     return (
-      <Empty
-        description="Chưa có sản phẩm nào trong giỏ hàng"
-        image={Empty.PRESENTED_IMAGE_SIMPLE}
-      />
+      <>
+        <Card
+          title="Giỏ hàng của bạn"
+          style={{
+            marginBottom: 10,
+            boxShadow: "0 4px 6px rgba(57,73,76,.35)",
+            borderRadius: "8px",
+            border: "1px solid #f0f0f0",
+          }}
+          extra={
+            <Button type="primary" onClick={() => router.push("/")}>
+              Tiếp tục mua hàng
+            </Button>
+          }
+        >
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description="Không có sản phẩm nào trong giỏ hàng"
+          />
+        </Card>
+      </>
     );
-  }
-  const handlePayment = () => {
-    router.push("/checkout/payment");
-  };
+
+  console.log(cartDetails);
 
   return (
     <>
+      {contextHolder}
       <Row gutter={[16, 16]}>
-        <Col span={17}>
+        <Col span={16}>
           <Title level={5}>Giỏ hàng của bạn</Title>
           <Card>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-              }}
+            <Checkbox
+              indeterminate={
+                checkedList.length > 0 &&
+                checkedList.length < cartData.data.products.length
+              }
+              checked={checkedList.length === cartData.data.products.length}
+              onChange={(e) =>
+                setCheckedList(
+                  e.target.checked
+                    ? cartData.data.products.map((item) => item.productId)
+                    : []
+                )
+              }
             >
-              <Checkbox
-                style={{
-                  fontSize: "1rem",
-                  color: "rgb(120, 120, 120)",
-                }}
-                indeterminate={indeterminate}
-                checked={
-                  checkedList.length === cartDetails?.data?.products.length
-                }
-                onChange={(e) => {
-                  setCheckedList(
-                    e.target.checked
-                      ? cartDetails?.data?.products.map(
-                          (item: any) => item.productId
-                        )
-                      : []
-                  );
-                }}
-              >
-                Tất cả
-              </Checkbox>
-              <div
-                style={{
-                  display: "flex",
-                  gap: "16px",
-                  alignItems: "center",
-                  width: "750px",
-                  justifyContent: "space-between",
-                }}
-              >
-                <h6 style={{ fontSize: "1rem", color: "rgb(120, 120, 120)" }}>
-                  Đơn giá
-                </h6>
-                <h6 style={{ fontSize: "1rem", color: "rgb(120, 120, 120)" }}>
-                  Số lượng
-                </h6>
-                <h6 style={{ fontSize: "1rem", color: "rgb(120, 120, 120)" }}>
-                  Thành tiền
-                </h6>
-                <DeleteOutlined
-                  style={{
-                    fontSize: "1rem",
-                    color: "rgb(120, 120, 120)",
-                    cursor: "pointer",
-                  }}
-                />
-              </div>
-            </div>
+              Tất cả
+            </Checkbox>
           </Card>
 
-          {/* Chi tiết giỏ hàng */}
-          <Card style={{ margin: "10px 0" }}>
-            <CheckboxGroup
-              value={checkedList}
-              onChange={onChange}
-              style={{ display: "flex", flexDirection: "column", gap: "16px" }}
-            >
-              {cartDetails?.data?.products.map((item: any) => (
-                <div
-                  key={item.productId}
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "10px 0",
-                    borderBottom: "1px solid #f0f0f0",
-                  }}
-                >
-                  <Checkbox value={item.productId}>{item.productName}</Checkbox>
-                  <div style={{ width: "100px", textAlign: "right" }}>
-                    {item.varients[0].variantPrice.toLocaleString()} VND
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "8px",
+          <Card style={{ marginTop: 10 }}>
+            {cartData.data.products.map((item) => (
+              <Row
+                key={item.productId}
+                align="middle"
+                gutter={16}
+                style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0" }}
+              >
+                <Col span={1}>
+                  <Checkbox value={item.productId} />
+                </Col>
+                {/* <Col span={2}>
+                <Image
+                  src={item?.varients[item]?.variant_img}
+                  alt={item?.productName}
+                  width={50}
+                  height={50}
+                />
+              </Col> */}
+                <Col span={5}>{item.productName}</Col>
+                <Col span={4} style={{ textAlign: "right" }}>
+                  {item.varients[0].variantPrice.toLocaleString()} VND
+                </Col>
+                <Col span={4}>
+                  <InputNumber
+                    min={1}
+                    value={item.varients[0].quantity}
+                    onChange={(value) =>
+                      handleQuantityChange(
+                        item.productId,
+                        item.varients[0].variantId,
+                        value || 1
+                      )
+                    }
+                  />
+                </Col>
+                <Col span={4} style={{ textAlign: "right" }}>
+                  {(
+                    item.varients[0].variantPrice * item.varients[0].quantity
+                  ).toLocaleString()}{" "}
+                  VND
+                </Col>
+                <Col span={2} style={{ textAlign: "center" }}>
+                  <Popconfirm
+                    title="Xác nhận xóa sản phẩm này?"
+                    description="Sản phẩm sẽ bị xóa khỏi giỏ hàng"
+                    okText="Có"
+                    cancelText="Không"
+                    onConfirm={async () => {
+                      try {
+                        const response = await fetch(
+                          `${process.env.NEXT_PUBLIC_API_URL}cart-service/api/v1/cart-item`,
+                          {
+                            method: "DELETE",
+                            headers: {
+                              "Content-Type": "application/json",
+                              Authorization: `Bearer ${session?.user?.access_token}`,
+                            },
+                            body: JSON.stringify({
+                              userId: session.user.id,
+                              variantId: item.varients[0].variantId,
+                            }),
+                          }
+                        );
+                        if (!response.ok)
+                          throw new Error("Failed to delete item");
+
+                        messageApi.open({
+                          type: "success",
+                          content: "Đã xóa sản phẩm khỏi giỏ hàng",
+                        });
+                        mutate();
+                      } catch {
+                        messageApi.open({
+                          type: "error",
+                          content: "Không thể xóa sản phẩm",
+                        });
+                      }
                     }}
                   >
-                    <Button
-                      icon={<MinusOutlined />}
-                      size="small"
-                      onClick={() => {} /* handle decrease quantity */}
+                    <DeleteOutlined
+                      style={{ color: "red", cursor: "pointer" }}
                     />
-                    <InputNumber
-                      min={1}
-                      value={item.varients[0].quantity}
-                      onChange={(value) => {} /* handle quantity change */}
-                      style={{ width: "60px" }}
-                    />
-                    <Button
-                      icon={<PlusOutlined />}
-                      size="small"
-                      onClick={() => {} /* handle increase quantity */}
-                    />
-                  </div>
-                  <div style={{ width: "100px", textAlign: "right" }}>
-                    {(
-                      item.varients[0].variantPrice * item.varients[0].quantity
-                    ).toLocaleString()}{" "}
-                    VND
-                  </div>
-                  <DeleteOutlined
-                    style={{
-                      fontSize: "1rem",
-                      color: "rgb(120, 120, 120)",
-                      cursor: "pointer",
-                    }}
-                  />
-                </div>
-              ))}
-            </CheckboxGroup>
+                  </Popconfirm>
+                </Col>
+              </Row>
+            ))}
           </Card>
         </Col>
-        <Col span={7}>
-          <Card title="Tóm tắt đơn hàng" style={{ width: "100%" }}>
-            <div
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                marginBottom: "8px",
-              }}
-            >
-              <span>Tổng tiền:</span>
-              <span>
-                {cartDetails?.data?.products
+
+        <Col span={8}>
+          <Card title="Tóm tắt đơn hàng">
+            <Row justify="space-between">
+              <Col>Tổng tiền:</Col>
+              <Col>
+                {cartData.data.products
                   .reduce(
-                    (total: number, item: any) =>
+                    (total, item) =>
                       total +
                       item.varients[0].variantPrice * item.varients[0].quantity,
                     0
                   )
                   .toLocaleString()}{" "}
                 VND
-              </span>
-            </div>
+              </Col>
+            </Row>
             <Divider />
-            <Button type="primary" block onClick={() => handlePayment()}>
-              Mua hàng ngay {cartDetails?.data?.products.length} sản phẩm
+            <Row justify="space-between">
+              <Col>Giảm giá:</Col>
+              <Col>- 0 VND</Col>
+            </Row>
+            <Row
+              justify="space-between"
+              style={{ fontWeight: "bold", fontSize: "16px", marginTop: "8px" }}
+            >
+              <Col>Thành tiền:</Col>
+              <Col>
+                {cartData.data.products
+                  .reduce(
+                    (total, item) =>
+                      total +
+                      item.varients[0].variantPrice * item.varients[0].quantity,
+                    0
+                  )
+                  .toLocaleString()}{" "}
+                VND
+              </Col>
+            </Row>
+            <Divider />
+            <Button
+              type="primary"
+              block
+              onClick={() => {
+                setLoading(true);
+                setTimeout(() => {
+                  router.push("/checkout/payment");
+                  setLoading(false);
+                }, 2000);
+              }}
+              loading={loading}
+            >
+              Thanh toán {cartDetails.data.products.length} sản phẩm
             </Button>
           </Card>
         </Col>
