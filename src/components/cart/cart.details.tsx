@@ -19,6 +19,7 @@ import { DeleteOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const CartDetails = ({ session }) => {
   const router = useRouter();
@@ -284,16 +285,18 @@ const CartDetails = ({ session }) => {
             <Button
               type="primary"
               block
-              onClick={() => {
-                setLoading(true);
-                setTimeout(() => {
-                  router.push("/checkout/payment");
-                  setLoading(false);
-                }, 2000);
-              }}
-              loading={loading}
+              // onClick={() => {
+              //   setLoading(true);
+              //   setTimeout(() => {
+              //     // router.push("/checkout/payment");
+              //     setLoading(false);
+              //   }, 2000);
+              // }}
+              // loading={loading}
             >
-              Thanh toán {cartDetails.data.products.length} sản phẩm
+              <Link href="/checkout/payment">
+                Thanh toán {cartDetails.data.products.length} sản phẩm
+              </Link>
             </Button>
           </Card>
         </Col>

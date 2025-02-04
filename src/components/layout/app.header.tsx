@@ -66,11 +66,11 @@ const AppHeader = (prop: IProps) => {
     | { label: React.JSX.Element; key: string }
   )[] = [
     {
-      label: <Link href={"/"}>Thông tin tài khoản</Link>,
+      label: <Link href={"/customer"}>Thông tin tài khoản</Link>,
       key: "0",
     },
     {
-      label: <Link href={"/"}>Đơn hàng của tôi</Link>,
+      label: <Link href={"/sales/order/history"}>Đơn hàng của tôi</Link>,
       key: "1",
     },
     {
@@ -102,11 +102,11 @@ const AppHeader = (prop: IProps) => {
     <div>
       <Button
         type="primary"
-        onClick={() => {
-          router.push("/checkout/cart");
-        }}
+        // onClick={() => {
+        //   router.push("/checkout/cart");
+        // }}
       >
-        Xem giỏ hàng và thanh toán
+        <Link href="/checkout/cart">Xem giỏ hàng và thanh toán</Link>
       </Button>
     </div>
   );
@@ -241,7 +241,6 @@ const AppHeader = (prop: IProps) => {
                       <Button
                         style={{
                           fontSize: "14px",
-                          fontWeight: "bold",
                           color: "#555",
                           border: "none",
                           background: "none",
@@ -249,7 +248,7 @@ const AppHeader = (prop: IProps) => {
                           boxShadow: "none",
                         }}
                       >
-                        Giỏ hàng
+                        <Link href="/checkout/cart">Giỏ hàng</Link>
                       </Button>
                     </Popover>
                   </div>
