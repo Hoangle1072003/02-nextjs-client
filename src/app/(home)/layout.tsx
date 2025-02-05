@@ -19,7 +19,7 @@ const AppLayout: React.FC<AppLayoutProps> = async ({ children }) => {
           width: "1440px",
           margin: "24px auto",
           maxWidth: "1440px",
-          // minHeight: "100vh",
+          minHeight: "50vh",
         }}
       >
         <AppContent>{children}</AppContent>

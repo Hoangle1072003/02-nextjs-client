@@ -101,7 +101,7 @@ const CustomerSider: React.FC<CustomerSiderProps> = ({ children }) => {
         <Layout style={{ flex: 1 }}>
           <Content
             style={{
-              padding: "24px",
+              padding: "0 12px",
               width: "100%",
               borderLeft: "1px solid rgba(0, 0, 0, 0.1)",
             }}

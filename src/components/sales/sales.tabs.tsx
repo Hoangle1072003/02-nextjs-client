@@ -3,13 +3,16 @@ import React from "react";
 import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 import SalesList from "./sales.list";
+import { useSession } from "next-auth/react";
 
 const SalesTabs: React.FC = () => {
+  const session = useSession();
+
   const items: TabsProps["items"] = [
     {
       key: "1",
       label: "Tất cả đơn",
-      children: <SalesList />,
+      children: <SalesList session={session} />,
     },
     {
       key: "2",
@@ -38,7 +41,11 @@ const SalesTabs: React.FC = () => {
     },
   ];
 
-  return <Tabs defaultActiveKey="1" items={items} />;
+  return (
+    <>
+      <Tabs defaultActiveKey="1" items={items} />
+    </>
+  );
 };
 
 export default SalesTabs;
