@@ -39,6 +39,8 @@ const SalesList = ({ session }: Iprops) => {
     { revalidateOnFocus: false }
   );
 
+  console.log(data);
+
   if (error) {
     return (
       <Result

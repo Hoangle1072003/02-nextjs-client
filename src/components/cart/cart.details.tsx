@@ -12,19 +12,22 @@ import {
   Skeleton,
   Empty,
   message,
-  Image,
   Popconfirm,
 } from "antd";
 import { DeleteOutlined } from "@ant-design/icons";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import useSWR from "swr";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
-const CartDetails = ({ session }) => {
+interface Iprops {
+  session: any;
+}
+
+const CartDetails = (props: Iprops) => {
+  const { session } = props;
   const router = useRouter();
-  const [loading, setLoading] = useState(false);
-  const fetcher = (url) =>
+  const fetcher = (url: string) =>
     fetch(url, {
       headers: { Authorization: `Bearer ${session?.user?.access_token}` },
     }).then((res) => res.json());
@@ -42,25 +45,21 @@ const CartDetails = ({ session }) => {
   );
 
   const [checkedList, setCheckedList] = useState([]);
-  const [cartData, setCartData] = useState(cartDetails);
-
-  useEffect(
-    () => setCartData(cartDetails),
-
-    [cartDetails]
-  );
+  const [optimisticCart, setOptimisticCart] = useState(null);
 
   const handleQuantityChange = async (
     productId: string,
     variantId: string,
     newQuantity: number
   ) => {
-    const previousCart = { ...cartData };
-    setCartData((prev) => ({
-      ...prev,
+    if (!cartDetails) return;
+
+    const previousCart = { ...cartDetails };
+    setOptimisticCart({
+      ...cartDetails,
       data: {
-        ...prev.data,
-        products: prev.data.products.map((item) =>
+        ...cartDetails.data,
+        products: cartDetails.data.products.map((item) =>
           item.productId === productId
             ? {
                 ...item,
@@ -69,7 +68,7 @@ const CartDetails = ({ session }) => {
             : item
         ),
       },
-    }));
+    });
 
     try {
       const response = await fetch(
@@ -95,38 +94,40 @@ const CartDetails = ({ session }) => {
         type: "error",
         content: "Không thể cập nhật số lượng",
       });
-      setCartData(previousCart);
+      console.log(error);
+
+      setOptimisticCart(null);
+      mutate(previousCart, false);
     }
   };
 
   if (error) return <div>Failed to load cart details</div>;
   if (isLoading) return <Skeleton active />;
-  if (!cartData?.data)
-    return (
-      <>
-        <Card
-          title="Giỏ hàng của bạn"
-          style={{
-            marginBottom: 10,
-            boxShadow: "0 4px 6px rgba(57,73,76,.35)",
-            borderRadius: "8px",
-            border: "1px solid #f0f0f0",
-          }}
-          extra={
-            <Button type="primary" onClick={() => router.push("/")}>
-              Tiếp tục mua hàng
-            </Button>
-          }
-        >
-          <Empty
-            image={Empty.PRESENTED_IMAGE_SIMPLE}
-            description="Không có sản phẩm nào trong giỏ hàng"
-          />
-        </Card>
-      </>
-    );
 
-  console.log(cartDetails);
+  const displayCart = optimisticCart || cartDetails;
+
+  if (!displayCart?.data?.products?.length)
+    return (
+      <Card
+        title="Giỏ hàng của bạn"
+        style={{
+          marginBottom: 10,
+          boxShadow: "0 4px 6px rgba(57,73,76,.35)",
+          borderRadius: "8px",
+          border: "1px solid #f0f0f0",
+        }}
+        extra={
+          <Button type="primary" onClick={() => router.push("/")}>
+            Tiếp tục mua hàng
+          </Button>
+        }
+      >
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="Không có sản phẩm nào trong giỏ hàng"
+        />
+      </Card>
+    );
 
   return (
     <>
@@ -138,13 +139,13 @@ const CartDetails = ({ session }) => {
             <Checkbox
               indeterminate={
                 checkedList.length > 0 &&
-                checkedList.length < cartData.data.products.length
+                checkedList.length < displayCart.data.products.length
               }
-              checked={checkedList.length === cartData.data.products.length}
+              checked={checkedList.length === displayCart.data.products.length}
               onChange={(e) =>
                 setCheckedList(
                   e.target.checked
-                    ? cartData.data.products.map((item) => item.productId)
+                    ? displayCart.data.products.map((item) => item.productId)
                     : []
                 )
               }
@@ -154,7 +155,7 @@ const CartDetails = ({ session }) => {
           </Card>
 
           <Card style={{ marginTop: 10 }}>
-            {cartData.data.products.map((item) => (
+            {displayCart.data.products.map((item) => (
               <Row
                 key={item.productId}
                 align="middle"
@@ -164,14 +165,6 @@ const CartDetails = ({ session }) => {
                 <Col span={1}>
                   <Checkbox value={item.productId} />
                 </Col>
-                {/* <Col span={2}>
-                <Image
-                  src={item?.varients[item]?.variant_img}
-                  alt={item?.productName}
-                  width={50}
-                  height={50}
-                />
-              </Col> */}
                 <Col span={5}>{item.productName}</Col>
                 <Col span={4} style={{ textAlign: "right" }}>
                   {item.varients[0].variantPrice.toLocaleString()} VND
@@ -248,7 +241,7 @@ const CartDetails = ({ session }) => {
             <Row justify="space-between">
               <Col>Tổng tiền:</Col>
               <Col>
-                {cartData.data.products
+                {displayCart.data.products
                   .reduce(
                     (total, item) =>
                       total +
@@ -270,7 +263,7 @@ const CartDetails = ({ session }) => {
             >
               <Col>Thành tiền:</Col>
               <Col>
-                {cartData.data.products
+                {displayCart.data.products
                   .reduce(
                     (total, item) =>
                       total +
@@ -282,20 +275,9 @@ const CartDetails = ({ session }) => {
               </Col>
             </Row>
             <Divider />
-            <Button
-              type="primary"
-              block
-              // onClick={() => {
-              //   setLoading(true);
-              //   setTimeout(() => {
-              //     // router.push("/checkout/payment");
-              //     setLoading(false);
-              //   }, 2000);
-              // }}
-              // loading={loading}
-            >
+            <Button type="primary" block>
               <Link href="/checkout/payment">
-                Thanh toán {cartDetails.data.products.length} sản phẩm
+                Thanh toán {displayCart.data.products.length} sản phẩm
               </Link>
             </Button>
           </Card>

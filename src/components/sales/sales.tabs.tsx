@@ -22,22 +22,22 @@ const SalesTabs: React.FC = () => {
     {
       key: "3",
       label: "Đang xử lý",
-      children: <div>Danh sách đơn hàng đang được xử lý</div>,
+      children: <div>Đang phát triển...</div>,
     },
     {
       key: "4",
       label: "Đang vận chuyển",
-      children: <div>Danh sách đơn hàng đang vận chuyển</div>,
+      children: <div>Đang phát triển...</div>,
     },
     {
       key: "5",
       label: "Đã giao",
-      children: <div>Danh sách đơn hàng đã giao</div>,
+      children: <div>Đang phát triển...</div>,
     },
     {
       key: "6",
       label: "Đã huỷ",
-      children: <div>Danh sách đơn hàng đã bị huỷ</div>,
+      children: <div>Đang phát triển...</div>,
     },
   ];
 
