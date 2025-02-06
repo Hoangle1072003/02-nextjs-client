@@ -10,7 +10,7 @@ interface Iprops {
   session: any;
 }
 
-const SalesList = ({ session }: Iprops) => {
+const SalesWaitList = ({ session }: Iprops) => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const { replace } = useRouter();
@@ -37,9 +37,6 @@ const SalesList = ({ session }: Iprops) => {
     fetchOrders
   );
 
-  console.log(data);
-  console.log(error);
-
   if (error) {
     return (
       <Result
@@ -51,8 +48,11 @@ const SalesList = ({ session }: Iprops) => {
   }
 
   const orders = data?.data?.result || [];
+  const pendingOrders = orders.filter(
+    (order: any) => order.paymentStatus === "PENDING"
+  );
+
   const meta = data?.data?.meta || {};
-  console.log(orders);
 
   const columns = [
     {
@@ -193,7 +193,7 @@ const SalesList = ({ session }: Iprops) => {
 
   return (
     <Table
-      dataSource={orders}
+      dataSource={pendingOrders}
       columns={columns}
       loading={isLoading}
       pagination={{
@@ -221,4 +221,4 @@ const SalesList = ({ session }: Iprops) => {
   );
 };
 
-export default SalesList;
+export default SalesWaitList;

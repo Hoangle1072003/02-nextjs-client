@@ -17,7 +17,6 @@ import {
 import { DeleteOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import useSWR from "swr";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 interface Iprops {
@@ -26,7 +25,6 @@ interface Iprops {
 
 const CartDetails = (props: Iprops) => {
   const { session } = props;
-  const router = useRouter();
   const fetcher = (url: string) =>
     fetch(url, {
       headers: { Authorization: `Bearer ${session?.user?.access_token}` },
@@ -43,6 +41,8 @@ const CartDetails = (props: Iprops) => {
       : null,
     fetcher
   );
+
+  console.log(cartDetails);
 
   const [checkedList, setCheckedList] = useState([]);
   const [optimisticCart, setOptimisticCart] = useState(null);
@@ -117,9 +117,10 @@ const CartDetails = (props: Iprops) => {
           border: "1px solid #f0f0f0",
         }}
         extra={
-          <Button type="primary" onClick={() => router.push("/")}>
-            Tiếp tục mua hàng
-          </Button>
+          // <Button type="primary" onClick={() => router.push("/")}>
+          //   Tiếp tục mua hàng
+          // </Button>
+          <Link href="/">Tiếp tục mua hàng</Link>
         }
       >
         <Empty
@@ -155,84 +156,89 @@ const CartDetails = (props: Iprops) => {
           </Card>
 
           <Card style={{ marginTop: 10 }}>
-            {displayCart.data.products.map((item) => (
-              <Row
-                key={item.productId}
-                align="middle"
-                gutter={16}
-                style={{ padding: "10px 0", borderBottom: "1px solid #f0f0f0" }}
-              >
-                <Col span={1}>
-                  <Checkbox value={item.productId} />
-                </Col>
-                <Col span={5}>{item.productName}</Col>
-                <Col span={4} style={{ textAlign: "right" }}>
-                  {item.varients[0].variantPrice.toLocaleString()} VND
-                </Col>
-                <Col span={4}>
-                  <InputNumber
-                    min={1}
-                    value={item.varients[0].quantity}
-                    onChange={(value) =>
-                      handleQuantityChange(
-                        item.productId,
-                        item.varients[0].variantId,
-                        value || 1
-                      )
-                    }
-                  />
-                </Col>
-                <Col span={4} style={{ textAlign: "right" }}>
-                  {(
-                    item.varients[0].variantPrice * item.varients[0].quantity
-                  ).toLocaleString()}{" "}
-                  VND
-                </Col>
-                <Col span={2} style={{ textAlign: "center" }}>
-                  <Popconfirm
-                    title="Xác nhận xóa sản phẩm này?"
-                    description="Sản phẩm sẽ bị xóa khỏi giỏ hàng"
-                    okText="Có"
-                    cancelText="Không"
-                    onConfirm={async () => {
-                      try {
-                        const response = await fetch(
-                          `${process.env.NEXT_PUBLIC_API_URL}cart-service/api/v1/cart-item`,
-                          {
-                            method: "DELETE",
-                            headers: {
-                              "Content-Type": "application/json",
-                              Authorization: `Bearer ${session?.user?.access_token}`,
-                            },
-                            body: JSON.stringify({
-                              userId: session.user.id,
-                              variantId: item.varients[0].variantId,
-                            }),
-                          }
-                        );
-                        if (!response.ok)
-                          throw new Error("Failed to delete item");
-
-                        messageApi.open({
-                          type: "success",
-                          content: "Đã xóa sản phẩm khỏi giỏ hàng",
-                        });
-                        mutate();
-                      } catch {
-                        messageApi.open({
-                          type: "error",
-                          content: "Không thể xóa sản phẩm",
-                        });
+            {displayCart.data.products
+              .filter((item) => item.varients[0].deletedAt === null)
+              .map((item) => (
+                <Row
+                  key={item.productId}
+                  align="middle"
+                  gutter={16}
+                  style={{
+                    padding: "10px 0",
+                    borderBottom: "1px solid #f0f0f0",
+                  }}
+                >
+                  <Col span={1}>
+                    <Checkbox value={item.productId} />
+                  </Col>
+                  <Col span={5}>{item.productName}</Col>
+                  <Col span={4} style={{ textAlign: "right" }}>
+                    {item.varients[0].variantPrice.toLocaleString()} VND
+                  </Col>
+                  <Col span={4}>
+                    <InputNumber
+                      min={1}
+                      value={item.varients[0].quantity}
+                      onChange={(value) =>
+                        handleQuantityChange(
+                          item.productId,
+                          item.varients[0].variantId,
+                          value || 1
+                        )
                       }
-                    }}
-                  >
-                    <DeleteOutlined
-                      style={{ color: "red", cursor: "pointer" }}
                     />
-                  </Popconfirm>
-                </Col>
-              </Row>
-            ))}
+                  </Col>
+                  <Col span={4} style={{ textAlign: "right" }}>
+                    {(
+                      item.varients[0].variantPrice * item.varients[0].quantity
+                    ).toLocaleString()}{" "}
+                    VND
+                  </Col>
+                  <Col span={2} style={{ textAlign: "center" }}>
+                    <Popconfirm
+                      title="Xác nhận xóa sản phẩm này?"
+                      description="Sản phẩm sẽ bị xóa khỏi giỏ hàng"
+                      okText="Có"
+                      cancelText="Không"
+                      onConfirm={async () => {
+                        try {
+                          const response = await fetch(
+                            `${process.env.NEXT_PUBLIC_API_URL}cart-service/api/v1/cart-item`,
+                            {
+                              method: "DELETE",
+                              headers: {
+                                "Content-Type": "application/json",
+                                Authorization: `Bearer ${session?.user?.access_token}`,
+                              },
+                              body: JSON.stringify({
+                                userId: session.user.id,
+                                variantId: item.varients[0].variantId,
+                              }),
+                            }
+                          );
+                          if (!response.ok)
+                            throw new Error("Failed to delete item");
+
+                          messageApi.open({
+                            type: "success",
+                            content: "Đã xóa sản phẩm khỏi giỏ hàng",
+                          });
+                          mutate();
+                        } catch {
+                          messageApi.open({
+                            type: "error",
+                            content: "Không thể xóa sản phẩm",
+                          });
+                        }
+                      }}
+                    >
+                      <DeleteOutlined
+                        style={{ color: "red", cursor: "pointer" }}
+                      />
+                    </Popconfirm>
+                  </Col>
+                </Row>
+              ))}
           </Card>
         </Col>
 
@@ -242,6 +248,7 @@ const CartDetails = (props: Iprops) => {
               <Col>Tổng tiền:</Col>
               <Col>
                 {displayCart.data.products
+                  .filter((item) => item.varients[0].deletedAt === null)
                   .reduce(
                     (total, item) =>
                       total +
@@ -264,6 +271,7 @@ const CartDetails = (props: Iprops) => {
               <Col>Thành tiền:</Col>
               <Col>
                 {displayCart.data.products
+                  .filter((item) => item.varients[0].deletedAt === null)
                   .reduce(
                     (total, item) =>
                       total +
@@ -277,7 +285,13 @@ const CartDetails = (props: Iprops) => {
             <Divider />
             <Button type="primary" block>
               <Link href="/checkout/payment">
-                Thanh toán {displayCart.data.products.length} sản phẩm
+                Thanh toán{" "}
+                {
+                  displayCart.data.products.filter(
+                    (item) => item.varients[0].deletedAt === null
+                  ).length
+                }{" "}
+                sản phẩm
               </Link>
             </Button>
           </Card>

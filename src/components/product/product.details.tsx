@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React from "react";
 import { Layout, Card, Row, Col, Rate, Breadcrumb, Button } from "antd";
 import Image from "next/image";
 import { useState } from "react";
@@ -8,7 +8,6 @@ import Link from "next/link";
 import { MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/lib/features/cart/cartSlice";
-import { log } from "console";
 
 interface IProps {
   session: any;

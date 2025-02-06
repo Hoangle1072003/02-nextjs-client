@@ -1,50 +1,76 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
 import { Tabs } from "antd";
 import type { TabsProps } from "antd";
 import SalesList from "./sales.list";
 import { useSession } from "next-auth/react";
+import SalesWaitList from "./sales.wait";
+import { AnimatePresence, motion } from "framer-motion";
+import SalesCanceled from "./sales.canceled";
 
 const SalesTabs: React.FC = () => {
   const session = useSession();
+  const [activeTab, setActiveTab] = useState("1");
 
-  const items: TabsProps["items"] = [
+  const tabContents = [
     {
       key: "1",
       label: "Tất cả đơn",
-      children: <SalesList session={session} />,
+      component: <SalesList session={session} />,
     },
     {
       key: "2",
       label: "Chờ thanh toán",
-      children: <div>Danh sách đơn hàng đang chờ thanh toán</div>,
+      component: <SalesWaitList session={session} />,
     },
     {
       key: "3",
       label: "Đang xử lý",
-      children: <div>Đang phát triển...</div>,
+      component: <div>Đang phát triển...</div>,
     },
     {
       key: "4",
       label: "Đang vận chuyển",
-      children: <div>Đang phát triển...</div>,
+      component: <div>Đang phát triển...</div>,
     },
     {
       key: "5",
       label: "Đã giao",
-      children: <div>Đang phát triển...</div>,
+      component: <div>Đang phát triển...</div>,
     },
     {
       key: "6",
       label: "Đã huỷ",
-      children: <div>Đang phát triển...</div>,
+      component: <SalesCanceled session={session} />,
     },
   ];
 
+  const tabsItems: TabsProps["items"] = tabContents.map((tab) => ({
+    key: tab.key,
+    label: tab.label,
+    children: null,
+  }));
+
   return (
-    <>
-      <Tabs defaultActiveKey="1" items={items} />
-    </>
+    <div>
+      <Tabs
+        items={tabsItems}
+        defaultActiveKey="1"
+        onChange={(key) => setActiveTab(key)}
+      />
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.15 }}
+        >
+          {tabContents.find((tab) => tab.key === activeTab)?.component}
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 };
 
