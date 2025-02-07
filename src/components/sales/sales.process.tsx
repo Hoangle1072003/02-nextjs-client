@@ -10,7 +10,7 @@ interface Iprops {
   session: any;
 }
 
-const SalesList = ({ session }: Iprops) => {
+const SalesProcess = ({ session }: Iprops) => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const { replace } = useRouter();
@@ -32,13 +32,10 @@ const SalesList = ({ session }: Iprops) => {
 
   const { data, error, isLoading } = useSWR(
     session?.data?.user?.id
-      ? `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/get-all-orders?userId=${session?.data?.user?.id}&current=${current}&pageSize=${pageSize}&sort=desc`
+      ? `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/get-all-orders-processing?userId=${session?.data?.user?.id}&current=${current}&pageSize=${pageSize}&sort=desc`
       : null,
     fetchOrders
   );
-
-  console.log(data);
-  console.log(error);
 
   if (error) {
     return (
@@ -51,8 +48,8 @@ const SalesList = ({ session }: Iprops) => {
   }
 
   const orders = data?.data?.result || [];
+
   const meta = data?.data?.meta || {};
-  console.log(orders);
 
   const columns = [
     {
@@ -225,4 +222,4 @@ const SalesList = ({ session }: Iprops) => {
   );
 };
 
-export default SalesList;
+export default SalesProcess;

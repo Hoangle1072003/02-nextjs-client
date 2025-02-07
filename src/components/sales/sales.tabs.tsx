@@ -7,6 +7,7 @@ import { useSession } from "next-auth/react";
 import SalesWaitList from "./sales.wait";
 import { AnimatePresence, motion } from "framer-motion";
 import SalesCanceled from "./sales.canceled";
+import SalesProcess from "./sales.process";
 
 const SalesTabs: React.FC = () => {
   const session = useSession();
@@ -26,7 +27,7 @@ const SalesTabs: React.FC = () => {
     {
       key: "3",
       label: "Đang xử lý",
-      component: <div>Đang phát triển...</div>,
+      component: <SalesProcess session={session} />,
     },
     {
       key: "4",

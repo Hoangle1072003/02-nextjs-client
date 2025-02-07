@@ -32,7 +32,7 @@ const SalesWaitList = ({ session }: Iprops) => {
 
   const { data, error, isLoading } = useSWR(
     session?.data?.user?.id
-      ? `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/get-all-orders?userId=${session?.data?.user?.id}&current=${current}&pageSize=${pageSize}&sort=asc`
+      ? `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/get-all-orders-waiting?userId=${session?.data?.user?.id}&current=${current}&pageSize=${pageSize}&sort=desc`
       : null,
     fetchOrders
   );
