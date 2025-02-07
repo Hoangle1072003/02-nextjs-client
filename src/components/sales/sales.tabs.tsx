@@ -1,22 +1,36 @@
 "use client";
 import React, { useState } from "react";
 import { Tabs } from "antd";
-import type { TabsProps } from "antd";
+import { Badge, TabsProps } from "antd";
 import SalesList from "./sales.list";
 import { useSession } from "next-auth/react";
 import SalesWaitList from "./sales.wait";
 import { AnimatePresence, motion } from "framer-motion";
 import SalesCanceled from "./sales.canceled";
 import SalesProcess from "./sales.process";
+import { useSelector } from "react-redux";
+import { RootState } from "@/lib/store";
 
 const SalesTabs: React.FC = () => {
   const session = useSession();
   const [activeTab, setActiveTab] = useState("1");
+  const orderList = useSelector((state: RootState) => state.salesList.orders);
 
   const tabContents = [
     {
       key: "1",
-      label: "Tất cả đơn",
+      label: (
+        <Badge count={orderList.length || 0}>
+          <span
+            style={{
+              color: "#000",
+              padding: "0 10px",
+            }}
+          >
+            Tất cả
+          </span>
+        </Badge>
+      ),
       component: <SalesList session={session} />,
     },
     {

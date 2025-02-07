@@ -5,6 +5,8 @@ import React from "react";
 import useSWR from "swr";
 import { Tag } from "antd";
 import Link from "next/link";
+import { useDispatch } from "react-redux";
+import { setOrders } from "@/lib/features/order/orderSlice";
 
 interface Iprops {
   session: any;
@@ -14,6 +16,7 @@ const SalesList = ({ session }: Iprops) => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const { replace } = useRouter();
+  const dispatch = useDispatch();
 
   const current = searchParams.get("current")
     ? Number(searchParams.get("current"))
@@ -36,9 +39,9 @@ const SalesList = ({ session }: Iprops) => {
       : null,
     fetchOrders
   );
-
-  console.log(data);
-  console.log(error);
+  if (data?.data?.result) {
+    dispatch(setOrders(data?.data?.result));
+  }
 
   if (error) {
     return (
@@ -52,7 +55,6 @@ const SalesList = ({ session }: Iprops) => {
 
   const orders = data?.data?.result || [];
   const meta = data?.data?.meta || {};
-  console.log(orders);
 
   const columns = [
     {
@@ -68,26 +70,6 @@ const SalesList = ({ session }: Iprops) => {
       key: "id",
     },
 
-    // {
-    //   title: "Sản phẩm",
-    //   key: "product",
-    //   render: (_: any, record: any) => {
-    //     const firstItem = record?.cartItems?.[0];
-    //     if (!firstItem) return "No products";
-    //     return (
-    //       <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-    //         <Image
-    //           src={firstItem.productVariant.varients[0].image}
-    //           alt="Product"
-    //           width={50}
-    //           height={50}
-    //           style={{ borderRadius: "5px", objectFit: "cover" }}
-    //         />
-    //         <span>{firstItem.productVariant.name}</span>
-    //       </div>
-    //     );
-    //   },
-    // },
     {
       title: "Tổng tiền",
       dataIndex: "totalAmount",
@@ -125,14 +107,7 @@ const SalesList = ({ session }: Iprops) => {
         return <Tag color={color}>{translatedStatus}</Tag>;
       },
     },
-    // {
-    //   title: "Biến thể sản phẩm",
-    //   key: "variant",
-    //   render: (_: any, record: any) => {
-    //     const firstItem = record?.cartItems?.[0];
-    //     return firstItem ? firstItem.productVariant.varients[0].name : "N/A";
-    //   },
-    // },
+
     {
       title: "Trạng thái đơn hàng",
       key: "orderStatus",
@@ -161,6 +136,10 @@ const SalesList = ({ session }: Iprops) => {
           case "PENDING":
             color = "orange";
             translatedStatus = "Đang chờ xử lý";
+            break;
+          case "SHIPPING":
+            color = "yellow";
+            translatedStatus = "Đang vận chuyển";
             break;
           default:
             translatedStatus = "Chưa xác định";

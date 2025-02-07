@@ -37,6 +37,7 @@ const SalesDetails = ({ id, session }: Iprops) => {
     data: dataOrderDetails,
     error,
     isLoading,
+    mutate,
   } = useSWR(
     session?.user?.access_token
       ? `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/get-all-orders-by-order-id/${id}`
@@ -89,6 +90,10 @@ const SalesDetails = ({ id, session }: Iprops) => {
       case "PENDING":
         color = "orange";
         translatedStatus = "Đang chờ xử lý";
+        break;
+      case "SHIPPING":
+        color = "yellow";
+        translatedStatus = "Đang giao hàng";
         break;
       default:
         translatedStatus = "Chưa xác định";
@@ -184,7 +189,7 @@ const SalesDetails = ({ id, session }: Iprops) => {
     setOpen(true);
   };
 
-  const handleOk = (reason: string) => {
+  const handleOk = async (reason: string) => {
     setConfirmLoading(true);
 
     const payload = {
@@ -192,7 +197,19 @@ const SalesDetails = ({ id, session }: Iprops) => {
       userId: session?.user?.id,
       reason: reason,
     };
-
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/cancel-order`,
+      {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session?.user?.access_token}`,
+        },
+        body: JSON.stringify(payload),
+      }
+    );
+    if (!res.ok) throw new Error("Failed to cancel order");
+    mutate();
     console.log("Dữ liệu gửi API:", payload);
 
     setTimeout(() => {
@@ -213,48 +230,69 @@ const SalesDetails = ({ id, session }: Iprops) => {
             <LeftOutlined />
             Quay lại
           </Link>
-          <Button
-            type="primary"
-            disabled={paymentStatus !== "PENDING"}
-            style={{
-              backgroundColor:
-                paymentStatus === "SUCCESS" && orderStatus === "SHIPPING"
-                  ? "#4CAF50"
-                  : paymentStatus === "SUCCESS" && orderStatus === "PROCESSING"
-                  ? "#2196F3"
-                  : paymentStatus === "PENDING" && orderStatus === "ACTIVE"
-                  ? "#FF5722"
-                  : paymentStatus === "FAILED" || paymentStatus === "CANCELLED"
-                  ? "#9E9E9E"
-                  : "#D32F2F",
-
-              borderColor: "transparent",
-              color: "#FFF",
-              fontWeight: "bold",
-              padding: "8px 16px",
-              borderRadius: "8px",
-              cursor:
+          <div style={{ display: "flex", gap: "12px" }}>
+            <Button
+              type="primary"
+              disabled={paymentStatus !== "PENDING"}
+              style={{
+                backgroundColor:
+                  paymentStatus === "SUCCESS" && orderStatus === "SHIPPING"
+                    ? "#4CAF50"
+                    : paymentStatus === "SUCCESS" &&
+                      orderStatus === "PROCESSING"
+                    ? "#2196F3"
+                    : paymentStatus === "PENDING" && orderStatus === "ACTIVE"
+                    ? "#FF5722"
+                    : paymentStatus === "FAILED" ||
+                      paymentStatus === "CANCELLED"
+                    ? "#9E9E9E"
+                    : "#D32F2F",
+                borderColor: "transparent",
+                color: "#FFF",
+                fontWeight: "bold",
+                padding: "8px 16px",
+                borderRadius: "8px",
+                cursor:
+                  paymentStatus === "PENDING" && orderStatus === "ACTIVE"
+                    ? "pointer"
+                    : "default",
+                opacity: paymentStatus !== "PENDING" ? 0.6 : 1,
+              }}
+              onClick={
                 paymentStatus === "PENDING" && orderStatus === "ACTIVE"
-                  ? "pointer"
-                  : "default",
-              opacity: paymentStatus !== "PENDING" ? 0.6 : 1,
-            }}
-            onClick={
-              paymentStatus === "PENDING" && orderStatus === "ACTIVE"
-                ? showModal
-                : undefined
-            }
-          >
-            {paymentStatus === "PENDING" && orderStatus === "ACTIVE"
-              ? "Hủy đơn hàng"
-              : paymentStatus === "FAILED" || paymentStatus === "CANCELLED"
-              ? "Đơn hàng đã hủy"
-              : paymentStatus === "SUCCESS" && orderStatus === "SHIPPING"
-              ? "Đơn hàng đang giao"
-              : paymentStatus === "SUCCESS" && orderStatus === "PROCESSING"
-              ? "Đơn hàng đang chờ xử lý"
-              : "Bạn cần liên hệ để huỷ đơn hàng"}
-          </Button>
+                  ? showModal
+                  : undefined
+              }
+            >
+              {paymentStatus === "PENDING" && orderStatus === "ACTIVE"
+                ? "Hủy đơn hàng"
+                : paymentStatus === "FAILED" || paymentStatus === "CANCELLED"
+                ? "Đơn hàng đã hủy"
+                : paymentStatus === "SUCCESS" && orderStatus === "SHIPPING"
+                ? "Đơn hàng đang được giao"
+                : paymentStatus === "SUCCESS" && orderStatus === "PROCESSING"
+                ? "Đơn hàng đang chờ xử lý"
+                : "Bạn cần liên hệ để huỷ đơn hàng"}
+            </Button>
+            {paymentStatus === "PENDING" && orderStatus === "ACTIVE" && (
+              <Link
+                href="/checkout/cart"
+                passHref
+                style={{
+                  backgroundColor: "#4CAF50",
+                  borderColor: "transparent",
+                  color: "#FFF",
+                  fontWeight: "bold",
+                  padding: "8px 16px",
+                  borderRadius: "8px",
+                  cursor: "pointer",
+                  opacity: 1,
+                }}
+              >
+                Tiến hành thanh toán
+              </Link>
+            )}
+          </div>
         </Flex>
 
         <Divider style={{ marginBottom: "20px", marginTop: "20px" }} />
