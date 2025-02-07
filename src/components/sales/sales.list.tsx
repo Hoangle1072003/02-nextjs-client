@@ -112,7 +112,7 @@ const SalesList = ({ session }: Iprops) => {
       title: "Trạng thái đơn hàng",
       key: "orderStatus",
       render: (_: any, record: any) => {
-        const status = record?.cart?.status || "Chưa xác định";
+        const status = record?.orderStatus || "Chưa xác định";
         let color = "default";
         let translatedStatus = status;
 
@@ -124,10 +124,6 @@ const SalesList = ({ session }: Iprops) => {
           case "COMPLETED":
             color = "green";
             translatedStatus = "Hoàn thành";
-            break;
-          case "EXPIRED":
-            color = "gray";
-            translatedStatus = "Hết hạn";
             break;
           case "CANCELLED":
             color = "red";

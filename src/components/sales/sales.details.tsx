@@ -63,7 +63,7 @@ const SalesDetails = ({ id, session }: Iprops) => {
   const order = dataOrderDetails?.data || {};
   const cartItems = order?.cartItems || [];
   const paymentStatus = order?.paymentStatus || "Chưa xác định";
-  const orderStatus = order?.cart?.status || "Chưa xác định";
+  const orderStatus = order?.orderStatus || "Chưa xác định";
   const totalAmount = order?.totalAmount || 0;
 
   const getStatusTag = (status: string) => {
@@ -79,10 +79,6 @@ const SalesDetails = ({ id, session }: Iprops) => {
         color = "green";
         translatedStatus = "Hoàn thành";
         break;
-      case "EXPIRED":
-        color = "gray";
-        translatedStatus = "Hết hạn";
-        break;
       case "CANCELLED":
         color = "red";
         translatedStatus = "Đã hủy";
@@ -93,7 +89,7 @@ const SalesDetails = ({ id, session }: Iprops) => {
         break;
       case "SHIPPING":
         color = "yellow";
-        translatedStatus = "Đang giao hàng";
+        translatedStatus = "Đang vận chuyển";
         break;
       default:
         translatedStatus = "Chưa xác định";
