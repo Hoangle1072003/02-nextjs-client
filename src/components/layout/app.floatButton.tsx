@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CommentOutlined,
   CustomerServiceOutlined,
@@ -17,6 +17,10 @@ import {
   Spin,
   Select,
 } from "antd";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState } from "@/lib/store";
+import { closeDrawer, openDrawer } from "@/lib/features/draw/drawerSlice";
+import { div } from "framer-motion/client";
 
 const { Text } = Typography;
 const { Option } = Select;
@@ -31,11 +35,20 @@ interface Message {
 const API_URL = `${process.env.NEXT_PUBLIC_API_URL}chat-service/api/qna/ask`;
 
 const CustomFloatButton: React.FC = ({ session }) => {
-  const [openChat, setOpenChat] = useState(false);
+  const open = useSelector((state: RootState) => state.drawer.open);
+  const productId = useSelector(
+    (state: RootState) => state?.productDetails.product?.id
+  );
+  const dispatch = useDispatch();
+
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [messageType, setMessageType] = useState("PRODUCT");
+
+  useEffect(() => {
+    console.log("Redux open changed:", open);
+  }, [open]);
 
   const handleSendMessage = async () => {
     if (!message.trim()) return;
@@ -61,7 +74,7 @@ const CustomFloatButton: React.FC = ({ session }) => {
         body: JSON.stringify({
           type: messageType,
           question: message,
-          productId: "678245f858237539dc9a2c9d",
+          productId: messageType === "PRODUCT" ? productId : null,
         }),
       });
 
@@ -103,7 +116,7 @@ const CustomFloatButton: React.FC = ({ session }) => {
         <FloatButton />
         <FloatButton
           icon={<CommentOutlined />}
-          onClick={() => setOpenChat(true)}
+          onClick={() => dispatch(openDrawer())}
         />
       </FloatButton.Group>
 
@@ -111,14 +124,14 @@ const CustomFloatButton: React.FC = ({ session }) => {
         title="Chat hỗ trợ"
         placement="right"
         closable={false}
-        onClose={() => setOpenChat(false)}
-        open={openChat}
+        onClose={() => dispatch(closeDrawer())}
+        open={open}
         width={400}
         extra={
           <Button
             type="text"
             icon={<CloseOutlined />}
-            onClick={() => setOpenChat(false)}
+            onClick={() => dispatch(closeDrawer())}
           />
         }
       >
@@ -160,15 +173,20 @@ const CustomFloatButton: React.FC = ({ session }) => {
             </div>
           )}
         </div>
-
-        <div
-          style={{
-            padding: 16,
-            // borderTop: "1px solid #f0f0f0",
-            // position: "fixed",
-            // bottom: 0,
-          }}
-        >
+        {productId && messageType === "PRODUCT" && (
+          <div
+            style={{
+              padding: 16,
+              borderTop: "1px solid #f0f0f0",
+              background: "#f5f5f",
+            }}
+          >
+            <Text type="secondary" style={{ fontSize: 12 }}>
+              Đang xem sản phẩm: {productId}
+            </Text>
+          </div>
+        )}
+        <div style={{ padding: 16 }}>
           <Select
             value={messageType}
             onChange={setMessageType}

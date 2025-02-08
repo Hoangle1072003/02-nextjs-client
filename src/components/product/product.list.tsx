@@ -1,6 +1,6 @@
 "use client";
 import AppCarousel from "@/components/layout/app.carousel";
-import { Card, Col, Row, Skeleton, Tooltip } from "antd";
+import { Card, Col, Empty, Row, Skeleton, Tooltip } from "antd";
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
@@ -29,7 +29,14 @@ const ProductList = () => {
   }
 
   if (!data || !data.data || data.data.length === 0) {
-    return <div>No products available.</div>;
+    return (
+      <>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="No products found."
+        />
+      </>
+    );
   }
 
   return (
