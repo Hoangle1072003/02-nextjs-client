@@ -49,6 +49,8 @@ const SalesProcess = ({ session }: Iprops) => {
 
   const orders = data?.data?.result || [];
 
+  console.log("orders", orders);
+
   const meta = data?.data?.meta || {};
 
   const columns = [
@@ -110,7 +112,7 @@ const SalesProcess = ({ session }: Iprops) => {
           translatedStatus = "Thất bại";
         } else if (status === "REFUNDED") {
           color = "blue";
-          translatedStatus = "Đã hoàn tiền";
+          translatedStatus = "Đang hoàn tiền";
         } else if (status === "EXPIRED") {
           color = "gray";
           translatedStatus = "Hết hạn";
@@ -134,7 +136,7 @@ const SalesProcess = ({ session }: Iprops) => {
       title: "Trạng thái đơn hàng",
       key: "orderStatus",
       render: (_: any, record: any) => {
-        const status = record?.cart?.status || "Chưa xác định";
+        const status = record?.orderStatus || "Chưa xác định";
         let color = "default";
         let translatedStatus = status;
 
@@ -147,10 +149,6 @@ const SalesProcess = ({ session }: Iprops) => {
             color = "green";
             translatedStatus = "Hoàn thành";
             break;
-          case "EXPIRED":
-            color = "gray";
-            translatedStatus = "Hết hạn";
-            break;
           case "CANCELLED":
             color = "red";
             translatedStatus = "Đã hủy";
@@ -158,6 +156,10 @@ const SalesProcess = ({ session }: Iprops) => {
           case "PENDING":
             color = "orange";
             translatedStatus = "Đang chờ xử lý";
+            break;
+          case "SHIPPING":
+            color = "yellow";
+            translatedStatus = "Đang vận chuyển";
             break;
           default:
             translatedStatus = "Chưa xác định";

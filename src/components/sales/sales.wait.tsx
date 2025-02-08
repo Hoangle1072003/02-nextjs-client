@@ -113,7 +113,7 @@ const SalesWaitList = ({ session }: Iprops) => {
           translatedStatus = "Thất bại";
         } else if (status === "REFUNDED") {
           color = "blue";
-          translatedStatus = "Đã hoàn tiền";
+          translatedStatus = "Đang hoàn tiền";
         } else if (status === "EXPIRED") {
           color = "gray";
           translatedStatus = "Hết hạn";

@@ -12,7 +12,7 @@ interface Iprops {
   session: any;
 }
 
-const SalesList = ({ session }: Iprops) => {
+const SalesShipping = ({ session }: Iprops) => {
   const searchParams = useSearchParams();
   const pathName = usePathname();
   const { replace } = useRouter();
@@ -35,7 +35,7 @@ const SalesList = ({ session }: Iprops) => {
 
   const { data, error, isLoading } = useSWR(
     session?.data?.user?.id
-      ? `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/get-all-orders?userId=${session?.data?.user?.id}&current=${current}&pageSize=${pageSize}&sort=desc`
+      ? `${process.env.NEXT_PUBLIC_API_URL}order-service/api/v1/orders/get-all-orders-shipping?userId=${session?.data?.user?.id}&current=${current}&pageSize=${pageSize}&sort=desc`
       : null,
     fetchOrders
   );
@@ -200,4 +200,4 @@ const SalesList = ({ session }: Iprops) => {
   );
 };
 
-export default SalesList;
+export default SalesShipping;

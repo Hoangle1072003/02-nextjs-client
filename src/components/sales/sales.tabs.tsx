@@ -10,6 +10,7 @@ import SalesCanceled from "./sales.canceled";
 import SalesProcess from "./sales.process";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
+import SalesShipping from "./sales.shipping";
 
 const SalesTabs: React.FC = () => {
   const session = useSession();
@@ -46,7 +47,7 @@ const SalesTabs: React.FC = () => {
     {
       key: "4",
       label: "Đang vận chuyển",
-      component: <div>Đang phát triển...</div>,
+      component: <SalesShipping session={session} />,
     },
     {
       key: "5",
