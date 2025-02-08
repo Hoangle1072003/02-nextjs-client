@@ -122,6 +122,8 @@ const ProductDetails = (props: IProps) => {
                 );
               })}
             </div>
+            {/* Chat AI - Xem them san pham - draw*/}
+            <div>hello</div>
           </Col>
 
           {/* Price and Variant Selection Column */}
@@ -247,7 +249,6 @@ const ProductDetails = (props: IProps) => {
               </div>
             </Card>
           </Col>
-
           {/* Quantity and Cart Column */}
           <Col xs={24} md={10} lg={8}>
             <Card>
