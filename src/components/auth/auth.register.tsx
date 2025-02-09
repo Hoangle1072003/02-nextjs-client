@@ -1,60 +1,48 @@
 "use client";
-import { Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
+import { Button, Col, Divider, Form, Input, message, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { authenticate } from "@/utils/actions";
 import { useState } from "react";
-import AuthStep from "./auth.active";
-import { useDispatch } from "react-redux";
-import { setUser } from "@/lib/features/auth/authSlice";
+import { useRouter } from "next/navigation";
 
-const AuthLogin = () => {
+const AuthRegister = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [loadings, setLoadings] = useState<boolean[]>([]);
   const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const dispatch = useDispatch();
-
-  const handleCancel = () => {
-    console.log("Clicked cancel button");
-    setOpen(false);
-  };
 
   const onFinish = async (values: any) => {
-    const { username, password } = values;
+    const { email, password, name } = values;
 
     setLoadings([true]);
+    console.log("values", values);
 
     try {
-      const res = await authenticate(username, password);
-      // if (res?.error && res?.code === 2) {
-      //   dispatch(setUser({ email: username }));
-      //   console.log("res.error", res);
-      //   messageApi.error(res.error);
-      //   setOpen(true);
-      // } else {
-      //   messageApi.success("Login successfully!");
-
-      //   setTimeout(() => {
-      //     router.push("/");
-      //   }, 2000);
-      // }
-      if (res?.error) {
-        if (res?.code === 2) {
-          dispatch(setUser({ email: username }));
-          setOpen(true);
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}identity-service/api/v1/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password, name }),
         }
-        messageApi.error(res.error);
-      } else {
-        messageApi.success("Login successfully!");
-
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
-      }
+      );
+      setTimeout(async () => {
+        setLoadings([false]);
+        if (res.status === 201) {
+          messageApi.success(
+            "Đăng ký thành công - vui lòng kích hoạt tài khoản qua email"
+          );
+          router.push("/auth/login");
+        } else {
+          messageApi.error("Email đã tồn tại");
+        }
+      }, 2000);
     } catch (error) {
-      messageApi.error("An error occurred. Please try again.");
+      setTimeout(() => {
+        setLoadings([false]);
+        messageApi.error("An error occurred. Please try again.");
+      }, 2000);
       console.log(error);
     } finally {
       setTimeout(() => setLoadings([false]), 1000);
@@ -74,20 +62,21 @@ const AuthLogin = () => {
               borderRadius: "5px",
             }}
           >
-            <legend>Đăng Nhập</legend>
+            <legend>Đăng ký</legend>
             <Form
               name="basic"
               onFinish={onFinish}
               autoComplete="off"
               layout="vertical"
               initialValues={{
-                username: "clientassist.office@gmail.com",
+                email: "clientassist.office@gmail.com",
                 password: "123456",
+                name: "Client Assist",
               }}
             >
               <Form.Item
                 label="Email"
-                name="username"
+                name="email"
                 rules={[
                   {
                     required: true,
@@ -111,9 +100,22 @@ const AuthLogin = () => {
                 <Input.Password />
               </Form.Item>
 
+              <Form.Item
+                label="Name"
+                name="name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your name!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={loadings[0]}>
-                  Đăng nhập
+                  Đăng ký
                 </Button>
               </Form.Item>
             </Form>
@@ -122,22 +124,14 @@ const AuthLogin = () => {
             </Link>
             <Divider />
             <div style={{ textAlign: "center" }}>
-              Chưa có tài khoản?{" "}
-              <Link href={"/auth/register"}>Đăng ký tại đây</Link>
+              Bạn đã có tài khoản?
+              <Link href={"/auth/login"}>Đăng nhập tại đây</Link>
             </div>
           </fieldset>
         </Col>
       </Row>
-      <Modal
-        title="Kích hoạt tài khoản"
-        open={open}
-        onCancel={handleCancel}
-        footer
-      >
-        <AuthStep />
-      </Modal>
     </>
   );
 };
 
-export default AuthLogin;
+export default AuthRegister;

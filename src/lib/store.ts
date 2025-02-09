@@ -3,6 +3,7 @@ import orderReducer from "@/lib/features/order/orderSlice";
 import cartReducer from "@/lib/features/cart/cartSlice";
 import productReducer from "@/lib/features/product/productSlice";
 import drawerReducer from "@/lib/features/draw/drawerSlice";
+import authUserLogin from "@/lib/features/auth/authSlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -11,6 +12,7 @@ export const makeStore = () => {
       cart: cartReducer,
       productDetails: productReducer,
       drawer: drawerReducer,
+      authUser: authUserLogin,
     },
   });
 };
