@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import { sendRequest } from "@/utils/api";
 import Credentials from "@auth/core/providers/credentials";
 import { IUser } from "@/types/next-auth";
+import Google from "next-auth/providers/google";
 import {
   InActiveAccountError,
   InvalidEmailPasswordError,
@@ -43,13 +44,43 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         return user;
       },
     }),
+    Google,
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
       if (user) {
         token.user = user as IUser;
+        console.log("user", user);
+        console.log("token", token);
+        console.log("account", account);
       }
-      // ACTIVATED, DEACTIVATED, SUSPENDED, PENDING_ACTIVATION
+
+      if (account && account?.provider === "google") {
+        // token.user = user as IUser;
+        // token.user.access_token = account?.id_token;
+        const res = await sendRequest({
+          method: "POST",
+          url: `${process.env.NEXT_PUBLIC_API_URL}identity-service/api/v1/auth/create-new-user-google`,
+          body: {
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            sub: profile?.sub,
+          },
+        });
+
+        token.user = {
+          id: res?.data?.id,
+          access_token: account?.id_token,
+          email: res?.data?.email,
+          image: user.image,
+        };
+
+        if (!res.ok) {
+          console.error("Failed to create new user:", res);
+        }
+      }
+
       if (
         token?.user?.status === "DEACTIVATED" ||
         token?.user?.status === "SUSPENDED" ||
@@ -62,6 +93,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     session({ session, token }) {
       (session.user as IUser) = token.user;
+      // (session.user as IUser).access_token = token.user.access_token;
 
       return session;
     },

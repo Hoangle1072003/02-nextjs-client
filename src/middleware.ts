@@ -9,7 +9,7 @@ export const config = {
   //     "/((?!api|_next/static|_next/image|favicon.ico|auth).*)",
   //   ],
   matcher: [
-    "/((?!auth|verify|api|_next/static|_next/image|favicon.ico|$|product(?:/.*)?).*)",
+    "/((?!auth|verify|api|_next/static|_next/image|favicon.ico|$||product(?:/.*)?).*)",
   ],
 };
 export default function middleware(request) {

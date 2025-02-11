@@ -28,6 +28,7 @@ const ProductDetailsPage = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
   const res = await ProductDetailsById(id);
   const session = await auth();
+
   return (
     <>
       <ProductDetails

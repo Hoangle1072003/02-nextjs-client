@@ -6,6 +6,7 @@ import AppSider from "@/components/layout/app.sider";
 import { Content } from "antd/es/layout/layout";
 import AppLayout from "@/app/(home)/layout";
 import { CategoryList } from "@/utils/actions";
+import { auth } from "@/auth";
 
 const AppPage = async () => {
   const res = await sendRequest<IBackendRes<IProduct[]>>({

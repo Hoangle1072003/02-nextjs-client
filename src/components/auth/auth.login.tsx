@@ -1,6 +1,6 @@
 "use client";
 import { Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined, GoogleOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authenticate } from "@/utils/actions";
@@ -8,6 +8,7 @@ import { useState } from "react";
 import AuthStep from "./auth.active";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/lib/features/auth/authSlice";
+import { signIn } from "next-auth/react";
 
 const AuthLogin = () => {
   const [messageApi, contextHolder] = message.useMessage();
@@ -59,6 +60,13 @@ const AuthLogin = () => {
     } finally {
       setTimeout(() => setLoadings([false]), 1000);
     }
+  };
+
+  const handleLoginGoogle = async () => {
+    await signIn("google", {
+      callbackUrl: "/",
+      redirect: false,
+    });
   };
 
   return (
@@ -124,6 +132,23 @@ const AuthLogin = () => {
             <div style={{ textAlign: "center" }}>
               Chưa có tài khoản?{" "}
               <Link href={"/auth/register"}>Đăng ký tại đây</Link>
+            </div>
+            <Divider />
+            {/* Login Google */}
+            <div
+              style={{
+                textAlign: "center",
+                margin: "10px 0",
+              }}
+            >
+              <GoogleOutlined
+                style={{
+                  fontSize: "30px",
+                  color: "#DB4437",
+                  cursor: "pointer",
+                }}
+                onClick={handleLoginGoogle}
+              />
             </div>
           </fieldset>
         </Col>

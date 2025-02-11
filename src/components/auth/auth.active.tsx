@@ -81,11 +81,6 @@ const AuthStep = () => {
             status: currentStep >= 1 ? "finish" : "wait",
             icon: <SmileOutlined />,
           },
-          // {
-          //   title: "Done",
-          //   status: currentStep >= 2 ? "wait" : "wait",
-          //   icon: <SmileOutlined />,
-          // },
         ]}
       />
       <div style={{ marginTop: "20px" }}>
