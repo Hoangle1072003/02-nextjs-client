@@ -1,6 +1,10 @@
 "use client";
 import { Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
-import { ArrowLeftOutlined, GoogleOutlined } from "@ant-design/icons";
+import {
+  ArrowLeftOutlined,
+  GithubOutlined,
+  GoogleOutlined,
+} from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authenticate } from "@/utils/actions";
@@ -64,6 +68,13 @@ const AuthLogin = () => {
 
   const handleLoginGoogle = async () => {
     await signIn("google", {
+      callbackUrl: "/",
+      redirect: false,
+    });
+  };
+
+  const handleLoginGithub = async () => {
+    await signIn("github", {
       callbackUrl: "/",
       redirect: false,
     });
@@ -148,6 +159,15 @@ const AuthLogin = () => {
                   cursor: "pointer",
                 }}
                 onClick={handleLoginGoogle}
+              />
+              <GithubOutlined
+                style={{
+                  fontSize: "30px",
+                  color: "#24292e",
+                  cursor: "pointer",
+                  marginLeft: "10px",
+                }}
+                onClick={handleLoginGithub}
               />
             </div>
           </fieldset>

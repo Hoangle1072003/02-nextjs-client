@@ -7,6 +7,7 @@ import {
   InActiveAccountError,
   InvalidEmailPasswordError,
 } from "@/utils/errors";
+import GitHub from "next-auth/providers/github";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -45,6 +46,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
     Google,
+    GitHub,
   ],
   callbacks: {
     async jwt({ token, user, account, profile }) {
@@ -64,7 +66,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           body: {
             email: user.email,
             name: user.name,
-            image: user.image,
+            picture: user.image,
             sub: profile?.sub,
           },
         });
@@ -74,6 +76,36 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           access_token: account?.id_token,
           email: res?.data?.email,
           image: user.image,
+        };
+
+        if (!res.ok) {
+          console.error("Failed to create new user:", res);
+        }
+      }
+      if (account && account?.provider === "github") {
+        const res = await sendRequest({
+          method: "POST",
+          url: `${process.env.NEXT_PUBLIC_API_URL}identity-service/api/v1/auth/create-new-user-github`,
+          body: {
+            email: user?.email,
+            name: user?.name,
+            picture: user?.image,
+            sub: account?.providerAccountId,
+          },
+        });
+        console.log("resData", res);
+
+        // token.user = {
+        //   id: res?.data?.id,
+        //   access_token: account?.access_token,
+        //   email: res?.data?.email,
+        //   image: user.image,
+        // };
+        token.user = {
+          id: res?.data?.id,
+          email: res?.data?.email,
+          image: user?.image,
+          access_token: account?.access_token,
         };
 
         if (!res.ok) {
