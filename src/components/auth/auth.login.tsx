@@ -1,10 +1,6 @@
 "use client";
 import { Button, Col, Divider, Form, Input, message, Modal, Row } from "antd";
-import {
-  ArrowLeftOutlined,
-  GithubOutlined,
-  GoogleOutlined,
-} from "@ant-design/icons";
+import { ArrowLeftOutlined, GoogleOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { authenticate } from "@/utils/actions";
@@ -73,12 +69,12 @@ const AuthLogin = () => {
     });
   };
 
-  const handleLoginGithub = async () => {
-    await signIn("github", {
-      callbackUrl: "/",
-      redirect: false,
-    });
-  };
+  // const handleLoginGithub = async () => {
+  //   await signIn("github", {
+  //     callbackUrl: "/",
+  //     redirect: false,
+  //   });
+  // };
 
   return (
     <>
@@ -129,6 +125,14 @@ const AuthLogin = () => {
               >
                 <Input.Password />
               </Form.Item>
+              {/* forgot password */}
+              <div
+                style={{
+                  textAlign: "right",
+                }}
+              >
+                <Link href={"/auth/forgot-password"}>Quên mật khẩu?</Link>
+              </div>
 
               <Form.Item>
                 <Button type="primary" htmlType="submit" loading={loadings[0]}>
@@ -160,7 +164,7 @@ const AuthLogin = () => {
                 }}
                 onClick={handleLoginGoogle}
               />
-              <GithubOutlined
+              {/* <GithubOutlined
                 style={{
                   fontSize: "30px",
                   color: "#24292e",
@@ -168,7 +172,7 @@ const AuthLogin = () => {
                   marginLeft: "10px",
                 }}
                 onClick={handleLoginGithub}
-              />
+              /> */}
             </div>
           </fieldset>
         </Col>
