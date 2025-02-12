@@ -66,7 +66,9 @@ const AppHeader = (prop: IProps) => {
     | { label: React.JSX.Element; key: string }
   )[] = [
     {
-      label: <Link href={"/customer"}>Thông tin tài khoản</Link>,
+      label: (
+        <Link href={`/customer/${session?.user?.id}`}>Thông tin tài khoản</Link>
+      ),
       key: "0",
     },
     {

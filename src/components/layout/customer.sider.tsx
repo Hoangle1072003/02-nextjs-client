@@ -10,47 +10,49 @@ import {
 import { Breadcrumb, Layout, Menu } from "antd";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession } from "next-auth/react";
 
 const { Content, Sider } = Layout;
-
-const menuItems = [
-  {
-    key: "1",
-    icon: <UserOutlined />,
-    label: "Thông tin tài khoản",
-    path: "/customer",
-  },
-  {
-    key: "2",
-    icon: <LockOutlined />,
-    label: "Quản lý đơn hàng của tôi",
-    path: "/sales/order/history",
-  },
-  {
-    key: "3",
-    icon: <EnvironmentOutlined />,
-    label: "Sổ địa chỉ",
-    path: "/customer/address",
-  },
-  {
-    key: "4",
-    icon: <CreditCardOutlined />,
-    label: "Hình thức thanh toán",
-    path: "/customer/payment",
-  },
-  {
-    key: "5",
-    icon: <FileTextOutlined />,
-    label: "Xuất hóa đơn",
-    path: "/customer/invoice",
-  },
-];
 
 interface CustomerSiderProps {
   children: React.ReactNode;
 }
 
 const CustomerSider: React.FC<CustomerSiderProps> = ({ children }) => {
+  const session = useSession();
+  const menuItems = [
+    {
+      key: "1",
+      icon: <UserOutlined />,
+      label: "Thông tin tài khoản",
+      path: `/customer/${session?.data?.user?.id}`,
+    },
+    {
+      key: "2",
+      icon: <LockOutlined />,
+      label: "Quản lý đơn hàng của tôi",
+      path: "/sales/order/history",
+    },
+    {
+      key: "3",
+      icon: <EnvironmentOutlined />,
+      label: "Sổ địa chỉ",
+      path: "/customer/address",
+    },
+    {
+      key: "4",
+      icon: <CreditCardOutlined />,
+      label: "Hình thức thanh toán",
+      path: "/customer/payment",
+    },
+    {
+      key: "5",
+      icon: <FileTextOutlined />,
+      label: "Xuất hóa đơn",
+      path: "/customer/invoice",
+    },
+  ];
+
   const pathname = usePathname();
 
   const currentItem = menuItems.find((item) => pathname.startsWith(item.path));
