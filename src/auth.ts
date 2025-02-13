@@ -46,7 +46,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       },
     }),
     Google,
-    GitHub,
   ],
   callbacks: {
     async jwt({ token, user, account, profile }) {
@@ -82,36 +81,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           console.error("Failed to create new user:", res);
         }
       }
-      if (account && account?.provider === "github") {
-        const res = await sendRequest({
-          method: "POST",
-          url: `${process.env.NEXT_PUBLIC_API_URL}identity-service/api/v1/auth/create-new-user-github`,
-          body: {
-            email: user?.email,
-            name: user?.name,
-            picture: user?.image,
-            sub: account?.providerAccountId,
-          },
-        });
-        console.log("resData", res);
-
-        // token.user = {
-        //   id: res?.data?.id,
-        //   access_token: account?.access_token,
-        //   email: res?.data?.email,
-        //   image: user.image,
-        // };
-        token.user = {
-          id: res?.data?.id,
-          email: res?.data?.email,
-          image: user?.image,
-          access_token: account?.access_token,
-        };
-
-        if (!res.ok) {
-          console.error("Failed to create new user:", res);
-        }
-      }
 
       if (
         token?.user?.status === "DEACTIVATED" ||
@@ -125,7 +94,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
     session({ session, token }) {
       (session.user as IUser) = token.user;
-      // (session.user as IUser).access_token = token.user.access_token;
 
       return session;
     },
@@ -135,6 +103,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: "/auth/login",
-    // error: "/auth/error",
   },
 });
