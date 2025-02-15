@@ -65,7 +65,7 @@ const AuthForgot = () => {
         >
           <legend>Quên mật khẩu</legend>
           <div style={{ marginBottom: "20px" }}>
-            <Link href="/auth/login">
+            <Link href="/guest/auth/login">
               <Button
                 icon={<LeftOutlined />}
                 type="link"

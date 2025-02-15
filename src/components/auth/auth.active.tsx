@@ -1,11 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import { Button, Input, Steps } from "antd";
-import {
-  SmileOutlined,
-  SolutionOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import { SmileOutlined, UserOutlined } from "@ant-design/icons";
 import { useSelector } from "react-redux";
 import { RootState } from "@/lib/store";
 

@@ -36,7 +36,7 @@ const ResetPassword = () => {
           content: "Mật khẩu đã được đặt lại thành công!",
         });
         setTimeout(() => {
-          router.push("/auth/login");
+          router.push("/guest/auth/login");
         }, 1500);
       }
       console.log("Password reset values:", data);
@@ -132,7 +132,7 @@ const ResetPassword = () => {
 
             <div style={{ textAlign: "center" }}>
               Chưa có tài khoản?{" "}
-              <Link href={"/auth/register"}>Đăng ký tại đây</Link>
+              <Link href={"/guest/auth/register"}>Đăng ký tại đây</Link>
             </div>
           </fieldset>
         </Col>
