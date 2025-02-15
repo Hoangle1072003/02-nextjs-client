@@ -131,7 +131,7 @@ const AuthLogin = () => {
                   textAlign: "right",
                 }}
               >
-                <Link href={"/auth/forgot-password"}>Quên mật khẩu?</Link>
+                <Link href={"/guest/auth/forgot-password"}>Quên mật khẩu?</Link>
               </div>
 
               <Form.Item>
@@ -146,7 +146,7 @@ const AuthLogin = () => {
             <Divider />
             <div style={{ textAlign: "center" }}>
               Chưa có tài khoản?{" "}
-              <Link href={"/auth/register"}>Đăng ký tại đây</Link>
+              <Link href={"/guest/auth/register"}>Đăng ký tại đây</Link>
             </div>
             <Divider />
             {/* Login Google */}

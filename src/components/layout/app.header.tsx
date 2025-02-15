@@ -67,12 +67,14 @@ const AppHeader = (prop: IProps) => {
   )[] = [
     {
       label: (
-        <Link href={`/customer/${session?.user?.id}`}>Thông tin tài khoản</Link>
+        <Link href={`/home/customer/${session?.user?.id}`}>
+          Thông tin tài khoản
+        </Link>
       ),
       key: "0",
     },
     {
-      label: <Link href={"/sales/order/history"}>Đơn hàng của tôi</Link>,
+      label: <Link href={"/home/sales/order/history"}>Đơn hàng của tôi</Link>,
       key: "1",
     },
     {
@@ -84,7 +86,7 @@ const AppHeader = (prop: IProps) => {
           Đăng xuất
         </div>
       ) : (
-        <Link href="/auth/login">Đăng nhập</Link>
+        <Link href="/guest/auth/login">Đăng nhập</Link>
       ),
       key: "3",
     },
@@ -108,7 +110,7 @@ const AppHeader = (prop: IProps) => {
         //   router.push("/checkout/cart");
         // }}
       >
-        <Link href="/checkout/cart">Xem giỏ hàng và thanh toán</Link>
+        <Link href="/home/checkout/cart">Xem giỏ hàng và thanh toán</Link>
       </Button>
     </div>
   );
@@ -217,7 +219,7 @@ const AppHeader = (prop: IProps) => {
                 <Badge count={cartItems.length} overflowCount={99}>
                   <div
                     onClick={() => {
-                      router.push("/checkout/cart");
+                      router.push("/home/checkout/cart");
                     }}
                     style={{
                       display: "flex",

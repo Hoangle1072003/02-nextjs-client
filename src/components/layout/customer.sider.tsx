@@ -25,19 +25,19 @@ const CustomerSider: React.FC<CustomerSiderProps> = ({ children }) => {
       key: "1",
       icon: <UserOutlined />,
       label: "Thông tin tài khoản",
-      path: `/customer/${session?.data?.user?.id}`,
+      path: `/home/customer/${session?.data?.user?.id}`,
     },
     {
       key: "2",
       icon: <LockOutlined />,
       label: "Quản lý đơn hàng của tôi",
-      path: "/sales/order/history",
+      path: "/home/sales/order/history",
     },
     {
       key: "3",
       icon: <EnvironmentOutlined />,
       label: "Sổ địa chỉ",
-      path: "/customer/address",
+      path: "/home/customer/address",
     },
     {
       key: "4",
@@ -49,7 +49,7 @@ const CustomerSider: React.FC<CustomerSiderProps> = ({ children }) => {
       key: "5",
       icon: <FileTextOutlined />,
       label: "Xuất hóa đơn",
-      path: "/customer/invoice",
+      path: "/home/customer/invoice",
     },
   ];
 

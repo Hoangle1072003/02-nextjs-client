@@ -46,7 +46,7 @@ const ProductList = () => {
         {data.data.map((product: IProduct, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} xl={4} key={index}>
             <Link
-              href={`/product/${converSlugUrl(product.name)}-${
+              href={`/home/product/${converSlugUrl(product.name)}-${
                 product.id
               }.html`}
               passHref={true}

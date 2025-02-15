@@ -125,7 +125,7 @@ const AuthRegister = () => {
             <Divider />
             <div style={{ textAlign: "center" }}>
               Bạn đã có tài khoản?
-              <Link href={"/auth/login"}>Đăng nhập tại đây</Link>
+              <Link href={"/guest/auth/login"}>Đăng nhập tại đây</Link>
             </div>
           </fieldset>
         </Col>

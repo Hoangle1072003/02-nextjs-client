@@ -1,8 +1,8 @@
 import { Button, Result } from "antd";
 import React from "react";
 import Link from "next/link";
-import AppLayout from "./(home)/layout";
 import ClientWrapper from "@/lib/client.wrapper";
+import AppLayout from "./home/layout";
 
 export default function Custom404() {
   return (

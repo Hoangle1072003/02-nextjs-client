@@ -284,7 +284,7 @@ const CartDetails = (props: Iprops) => {
             </Row>
             <Divider />
             <Button type="primary" block>
-              <Link href="/checkout/payment">
+              <Link href="/home/checkout/payment">
                 Thanh toán{" "}
                 {
                   displayCart.data.products.filter(

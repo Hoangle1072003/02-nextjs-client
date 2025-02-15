@@ -1,6 +1,6 @@
 import { Result } from "antd";
-import AppLayout from "./(home)/layout";
 import ClientWrapper from "@/lib/client.wrapper";
+import AppLayout from "./home/layout";
 
 export default function NotFound() {
   return (
