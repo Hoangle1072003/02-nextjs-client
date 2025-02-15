@@ -1,9 +1,6 @@
 services:
   nextjs-app:
-    image: ${{ secrets.DOCKER_USERNAME }}/nextjs-app:${{ github.sha }}
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ashleynguci1072003/nextjs-client-app:2dd4767bea7ee0760939f4f4749f451c4e2e42f0
     ports:
       - "3000:3000"
     networks:
