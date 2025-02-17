@@ -13,9 +13,11 @@ import {
   Radio,
   RadioChangeEvent,
   Row,
+  Skeleton,
   Typography,
 } from "antd";
 import { useState } from "react";
+import useSWR from "swr";
 type FieldType = {
   username?: string;
   password?: string;
@@ -26,7 +28,32 @@ type IProps = {
 };
 const CustomerDetails = (prop: IProps) => {
   const { session } = prop;
-  console.log(session?.data?.user?.name);
+
+  const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const {
+    data: user,
+    error,
+    isLoading,
+  } = useSWR(
+    session?.data?.user?.id
+      ? `${process.env.NEXT_PUBLIC_API_URL}identity-service/api/v1/user/${session?.data?.user?.id}`
+      : null,
+    fetcher
+  );
+
+  if (isLoading) {
+    return (
+      <>
+        <Skeleton active={isLoading} />
+      </>
+    );
+  }
+
+  if (error) {
+    return <div>Failed to load user details</div>;
+  }
+
+  console.log("data", user);
 
   const onFinish: FormProps<FieldType>["onFinish"] = (values) => {
     console.log("Success:", values);

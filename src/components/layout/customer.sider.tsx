@@ -20,6 +20,7 @@ interface CustomerSiderProps {
 
 const CustomerSider: React.FC<CustomerSiderProps> = ({ children }) => {
   const session = useSession();
+
   const menuItems = [
     {
       key: "1",
