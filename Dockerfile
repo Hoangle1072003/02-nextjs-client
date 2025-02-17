@@ -64,3 +64,7 @@ ENV PORT=3000
 # https://nextjs.org/docs/pages/api-reference/config/next-config-js/output
 ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
+
+
+#docker build -t next-app .
+#docker run -d -p 3000:3000 --name next-app-container next-app
