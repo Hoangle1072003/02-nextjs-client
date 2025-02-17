@@ -67,4 +67,4 @@ CMD ["node", "server.js"]
 
 
 #docker build -t next-app .
-#docker run -d -p 3000:3000 --name next-app-container next-app
+#docker run -d -p 3000:3000 --name next-client-hot next-app
