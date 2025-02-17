@@ -222,7 +222,7 @@ const SalesDetails = ({ id, session }: Iprops) => {
     <>
       <div>
         <Flex justify="space-between" align="center">
-          <Link href="/sales/order/history">
+          <Link href="/home/sales/order/history">
             <LeftOutlined />
             Quay lại
           </Link>

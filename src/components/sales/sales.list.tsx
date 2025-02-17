@@ -151,7 +151,7 @@ const SalesList = ({ session }: Iprops) => {
         return (
           <Link
             href={{
-              pathname: `/sales/order/history/${record.id}`,
+              pathname: `/home/sales/order/history/${record.id}`,
             }}
           >
             Xem chi tiết
