@@ -8,10 +8,10 @@ const { Option } = Select;
 const ProductGrid = ({ products }: { products: any[] }) => {
   const [showAll, setShowAll] = useState(false);
   const [pageNumber, setPageNumber] = useState(1);
-  const [paginatedProducts, setPaginatedProducts] = useState<any[]>([]); // Lưu trữ tất cả các sản phẩm đã được phân trang
-  const [totalProducts, setTotalProducts] = useState<number>(0); // Tổng số sản phẩm, dùng cho phân trang
-  const [sortOption, setSortOption] = useState<string>('name-asc'); // Tùy chọn sắp xếp theo tên hoặc giá
-  const [searchQuery, setSearchQuery] = useState<string>(''); // Từ khóa tìm kiếm dùng để lọc sản phẩm theo tên
+  const [paginatedProducts, setPaginatedProducts] = useState<any[]>([]);
+  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [sortOption, setSortOption] = useState<string>('name-asc');
+  const [searchQuery, setSearchQuery] = useState<string>('');
 
   useEffect(() => {
     if (showAll) {
@@ -33,7 +33,6 @@ const ProductGrid = ({ products }: { products: any[] }) => {
     }
   }, [showAll]);
 
-  // Xử lý sự thay đổi của truy vấn tìm kiếm
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
@@ -45,7 +44,6 @@ const ProductGrid = ({ products }: { products: any[] }) => {
     );
   }, [paginatedProducts, searchQuery]);
 
-  // Sắp xếp các sản phẩm đã lọc theo tùy chọn sắp xếp
   const sortedProducts = useMemo(() => {
     let sorted = [...filteredProducts];
     if (sortOption === 'price-asc') {
@@ -60,12 +58,10 @@ const ProductGrid = ({ products }: { products: any[] }) => {
     return sorted;
   }, [filteredProducts, sortOption]);
 
-  // Phân trang dữ liệu đã sắp xếp
   const paginatedData = useMemo(() => {
     return sortedProducts.slice((pageNumber - 1) * 12, pageNumber * 12);
   }, [sortedProducts, pageNumber]);
 
-  // Hiển thị sản phẩm (có thể là tất cả hoặc chỉ một phần)
   const displayedProducts = showAll ? paginatedData : products;
 
   const handlePageChange = (page: number) => {
@@ -148,7 +144,7 @@ const ProductGrid = ({ products }: { products: any[] }) => {
             total={totalProducts}
             pageSize={12}
             onChange={handlePageChange}
-            showSizeChanger={false} // Không hiển thị thay đổi số lượng sản phẩm trên mỗi trang
+            showSizeChanger={false}
           />
         </div>
       )}
