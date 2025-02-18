@@ -26,6 +26,7 @@ const AppSider = ({ categories }: { categories: ICategory[] }) => {
         marginRight: '16px'
       }}
     >
+      {/* Heading for the categories */}
       <div
         style={{
           padding: '16px',
@@ -40,7 +41,7 @@ const AppSider = ({ categories }: { categories: ICategory[] }) => {
 
       <Menu
         mode='inline'
-        defaultSelectedKeys={[categories?.[0]?.id || '']}
+        defaultSelectedKeys={[categories[0]?.id]}
         items={menuItems}
       />
     </Sider>

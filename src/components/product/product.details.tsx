@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use client';
 import React, { useEffect } from 'react';
 import { Layout, Card, Row, Col, Rate, Breadcrumb, Button } from 'antd';
@@ -8,6 +9,20 @@ import Link from 'next/link';
 import { MinusSquareOutlined, PlusSquareOutlined } from '@ant-design/icons';
 import { useDispatch } from 'react-redux';
 import { addToCart } from '@/lib/features/cart/cartSlice';
+=======
+"use client";
+import React, { useEffect } from "react";
+import { Layout, Card, Row, Col, Rate, Breadcrumb, Button } from "antd";
+import Image from "next/image";
+import { useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
+import { MinusSquareOutlined, PlusSquareOutlined } from "@ant-design/icons";
+import { useDispatch } from "react-redux";
+import { addToCart } from "@/lib/features/cart/cartSlice";
+import { setProduct } from "@/lib/features/product/productSlice";
+import { openDrawer } from "@/lib/features/draw/drawerSlice";
+>>>>>>> f4c17dc14254c7aa80a332192c5ea653e57ad67b
 
 interface IProps {
   session: any;
@@ -24,6 +39,12 @@ const ProductDetails = (props: IProps) => {
   const productPath = pathSegments[pathSegments.length - 1];
   const productName = productPath.replace(/-\w+\.html$/, '');
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (data) {
+      dispatch(setProduct(data));
+    }
+  }, [data, dispatch]);
 
   const handleVariantSelect = (variant: any) => {
     setSelectedVariant(variant);
@@ -121,6 +142,41 @@ const ProductDetails = (props: IProps) => {
                   />
                 );
               })}
+            </div>
+            {/* Chat AI - Xem them san pham - draw*/}
+            <div
+              onClick={() => dispatch(openDrawer())}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                marginTop: "20px",
+                borderRadius: "8px",
+                backgroundColor: "#f5f5f5",
+                cursor: "pointer",
+                transition: "background 0.3s",
+                width: "fit-content",
+                padding: "8px",
+              }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.backgroundColor = "#e0e0e0")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.backgroundColor = "#f5f5f5")
+              }
+            >
+              <Image
+                src="https://salt.tikicdn.com/ts/ta/d3/d4/1c/1d4ee6bf8bc9c5795529ac50a6b439dd.png"
+                alt="Chat AI"
+                width={30}
+                height={30}
+                style={{ borderRadius: "50%" }}
+              />
+              <span
+                style={{ fontSize: "14px", fontWeight: "500", color: "#333" }}
+              >
+                Xem thêm
+              </span>
             </div>
           </Col>
 
@@ -247,7 +303,6 @@ const ProductDetails = (props: IProps) => {
               </div>
             </Card>
           </Col>
-
           {/* Quantity and Cart Column */}
           <Col xs={24} md={10} lg={8}>
             <Card>

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 'use client';
 import AppCarousel from '@/components/layout/app.carousel';
 import { Card, Col, Row, Skeleton, Tooltip } from 'antd';
@@ -6,6 +7,16 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { converSlugUrl } from '@/utils/api';
 import useSWR from 'swr';
+=======
+"use client";
+import AppCarousel from "@/components/layout/app.carousel";
+import { Card, Col, Empty, Row, Skeleton, Tooltip } from "antd";
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { converSlugUrl } from "@/utils/api";
+import useSWR from "swr";
+>>>>>>> f4c17dc14254c7aa80a332192c5ea653e57ad67b
 
 const ProductList = () => {
   const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -29,7 +40,14 @@ const ProductList = () => {
   }
 
   if (!data || !data.data || data.data.length === 0) {
-    return <div>No products available.</div>;
+    return (
+      <>
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description="No products found."
+        />
+      </>
+    );
   }
   return (
     <>
@@ -38,7 +56,7 @@ const ProductList = () => {
         {data.data.map((product: IProduct, index: number) => (
           <Col xs={24} sm={12} md={8} lg={6} xl={4} key={index}>
             <Link
-              href={`/product/${converSlugUrl(product.name)}-${
+              href={`/home/product/${converSlugUrl(product.name)}-${
                 product.id
               }.html`}
               passHref={true}

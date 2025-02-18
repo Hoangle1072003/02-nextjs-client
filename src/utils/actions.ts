@@ -34,6 +34,7 @@ export async function ProductDetailsById(productId: string) {
 
   const res = await sendRequest<IBackendRes<any>>({
     url: `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products/${id}`,
+
     method: 'GET'
   });
   return res;

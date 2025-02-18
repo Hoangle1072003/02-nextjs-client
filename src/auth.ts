@@ -2,9 +2,16 @@ import NextAuth from 'next-auth';
 import { sendRequest } from '@/utils/api';
 import Credentials from '@auth/core/providers/credentials';
 import { IUser } from '@/types/next-auth';
-import { InvalidEmailPasswordError } from '@/utils/errors';
+import Google from 'next-auth/providers/google';
+import {
+  InActiveAccountError,
+  InvalidEmailPasswordError
+} from '@/utils/errors';
+import GitHub from 'next-auth/providers/github';
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
+  trustHost: true,
+  secret: 'mevlXBLRnm76NA+b/+PCwgCz98+JG3THScc8AHQ4DWk=',
   providers: [
     Credentials({
       credentials: {
@@ -21,9 +28,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             password: credentials.password
           }
         })) as IBackendRes<ILogin>;
-        console.log('API Response:', res);
         if (+res.statusCode === 500) {
           throw new InvalidEmailPasswordError(res.message);
+        } else if (+res.statusCode === 403) {
+          throw new InActiveAccountError(res.message);
         } else if (+res.statusCode === 200) {
           return {
             id: res.data?.user.id,
@@ -31,19 +39,57 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             email: res.data?.user.email,
             status: res.data?.user.status,
             access_token: res.data?.access_token,
-            role_id: res.data?.user.role?.id ?? null,
-            role_name: res.data?.user.role?.name ?? null,
-            role_status: res.data?.user.role?.status ?? null
+            role_id: res.data?.user.role.id,
+            role_name: res.data?.user.role.name,
+            role_status: res.data?.user.role.status
           };
         }
         return user;
       }
-    })
+    }),
+    Google
   ],
   callbacks: {
-    jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
       if (user) {
         token.user = user as IUser;
+        console.log('user', user);
+        console.log('token', token);
+        console.log('account', account);
+      }
+
+      if (account && account?.provider === 'google') {
+        // token.user = user as IUser;
+        // token.user.access_token = account?.id_token;
+        const res = await sendRequest({
+          method: 'POST',
+          url: `${process.env.NEXT_PUBLIC_API_URL}identity-service/api/v1/auth/create-new-user-google`,
+          body: {
+            email: user.email,
+            name: user.name,
+            picture: user.image,
+            sub: profile?.sub
+          }
+        });
+
+        token.user = {
+          id: res?.data?.id,
+          access_token: account?.id_token,
+          email: res?.data?.email,
+          image: user.image
+        };
+
+        if (!res.ok) {
+          console.error('Failed to create new user:', res);
+        }
+      }
+
+      if (
+        token?.user?.status === 'DEACTIVATED' ||
+        token?.user?.status === 'SUSPENDED' ||
+        token?.user?.status === 'PENDING_ACTIVATION'
+      ) {
+        await signOut();
       }
       return token;
     },
@@ -59,6 +105,5 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: '/auth/login'
-    // error: "/auth/error",
   }
 });

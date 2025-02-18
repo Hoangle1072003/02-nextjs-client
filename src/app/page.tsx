@@ -1,9 +1,9 @@
-import AppPage from "@/app/(home)/page";
 import { auth } from "@/auth";
+import AppPage from "./home/page";
 
 const Home = async () => {
   const session = await auth();
-  console.log(session);
+  console.log("session", session);
 
   return (
     <>

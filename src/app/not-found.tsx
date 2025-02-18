@@ -1,21 +1,17 @@
-"use client";
-import {Button, Result} from "antd";
-import {useRouter} from "next/navigation";
+import { Result } from "antd";
+import ClientWrapper from "@/lib/client.wrapper";
+import AppLayout from "./home/layout";
 
 export default function NotFound() {
-    const router = useRouter();
-    return (
-        <>
-            <Result
-                status="403"
-                title="403"
-                subTitle="Sorry, The page you are looking for is currently unavailable!"
-                extra={
-                    <Button type="primary" onClick={() => router.push("/")}>
-                        Back Home
-                    </Button>
-                }
-            />
-        </>
-    );
+  return (
+    <AppLayout>
+      <ClientWrapper>
+        <Result
+          status="403"
+          title="403"
+          subTitle="Xin lỗi, trang bạn đang tìm hiện không khả dụng!"
+        />
+      </ClientWrapper>
+    </AppLayout>
+  );
 }
