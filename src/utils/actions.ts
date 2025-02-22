@@ -10,18 +10,26 @@ export async function authenticate(username: string, password: string) {
       redirect: false,
     });
 
+    if (r?.error) {
+      console.error("Login Error:", r);
+    }
+
     return r;
   } catch (error) {
-    if ((error as any).name === "InvalidEmailPasswordError") {
-      return { error: error.type as any, code: 1 };
-    } else if ((error as any).name === "InActiveAccountError") {
-      return { error: error.type as any, code: 2 };
-    } else {
-      return {
-        error: "Internal Server Error",
-        code: 3,
-      };
+    console.error("Catch Error:", error);
+
+    if (error?.message?.includes("User is not activated")) {
+      return { error: "Tài khoản chưa được kích hoạt", code: 2 };
     }
+
+    if (error?.message?.includes("Bad credentials")) {
+      return { error: "Email or mật khẩu không đúng", code: 1 };
+    }
+
+    return {
+      error: "Internal Server Error",
+      code: 3,
+    };
   }
 }
 

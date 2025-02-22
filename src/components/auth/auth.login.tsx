@@ -29,24 +29,16 @@ const AuthLogin = () => {
 
     try {
       const res = await authenticate(username, password);
-      // if (res?.error && res?.code === 2) {
-      //   dispatch(setUser({ email: username }));
-      //   console.log("res.error", res);
-      //   messageApi.error(res.error);
-      //   setOpen(true);
-      // } else {
-      //   messageApi.success("Login successfully!");
+      console.log("res", res);
 
-      //   setTimeout(() => {
-      //     router.push("/");
-      //   }, 2000);
-      // }
       if (res?.error) {
         if (res?.code === 2) {
           dispatch(setUser({ email: username }));
           setOpen(true);
         }
         messageApi.error(res.error);
+      } else if (res?.code === 1) {
+        console.log("res.error", res);
       } else {
         messageApi.success("Login successfully!");
 
