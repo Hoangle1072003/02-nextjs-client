@@ -5,7 +5,7 @@ import { SWRConfig } from "swr";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import NextAuthWrapper from "@/lib/next.auth.wrapper";
 import StoreProvider from "@/app/StoreProvider";
-import Providers from "@/components/ProgressBarProvider";
+import NextTopLoader from "nextjs-toploader";
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -33,7 +33,19 @@ export default function RootLayout({
           <SWRConfig>
             <AntdRegistry>
               <NextAuthWrapper>
-                <Providers>{children}</Providers>
+                <NextTopLoader
+                  color="#1677ff"
+                  height={4}
+                  showSpinner={false}
+                  speed={200}
+                  easing="ease-in-out"
+                  shadow={false}
+                  initialPosition={0.1}
+                  crawl={true}
+                  crawlSpeed={150}
+                />
+
+                {children}
               </NextAuthWrapper>
             </AntdRegistry>
           </SWRConfig>

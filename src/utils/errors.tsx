@@ -17,3 +17,9 @@ export class InvalidEmailPasswordError extends AuthError {
 export class InActiveAccountError extends AuthError {
   static type = "Tài khoản chưa được kích hoạt";
 }
+export class AccountDeletedError extends AuthError {
+  static type = "Tài khoản đã bị xóa";
+}
+export class AccountNotSuspensionError extends AuthError {
+  static type = "Tài khoản không bị tạm khóa";
+}

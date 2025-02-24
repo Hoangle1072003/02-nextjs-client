@@ -4,6 +4,8 @@ import Credentials from "@auth/core/providers/credentials";
 import { IUser } from "@/types/next-auth";
 import Google from "next-auth/providers/google";
 import {
+  AccountDeletedError,
+  AccountNotSuspensionError,
   InActiveAccountError,
   InvalidEmailPasswordError,
 } from "@/utils/errors";
@@ -32,6 +34,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           throw new InvalidEmailPasswordError(res.message);
         } else if (+res.statusCode === 403) {
           throw new InActiveAccountError(res.message);
+        } else if (+res.statusCode === 410) {
+          throw new AccountDeletedError(res.message);
+        } else if (+res.statusCode === 423) {
+          throw new AccountNotSuspensionError(res.message);
         } else if (+res.statusCode === 200) {
           return {
             id: res.data?.user.id,

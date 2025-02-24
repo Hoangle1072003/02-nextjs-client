@@ -18,17 +18,22 @@ export async function authenticate(username: string, password: string) {
   } catch (error) {
     console.error("Catch Error:", error);
 
-    if (error?.message?.includes("User is not activated")) {
+    if (error?.message?.includes("User account is not activated")) {
       return { error: "Tài khoản chưa được kích hoạt", code: 2 };
     }
 
     if (error?.message?.includes("Bad credentials")) {
       return { error: "Email or mật khẩu không đúng", code: 1 };
     }
-
+    if (error?.message?.includes("User account has been deleted")) {
+      return { error: "Tài khoản đã bị xóa", code: 3 };
+    }
+    if (error?.message?.includes("User account is suspended")) {
+      return { error: "Tài khoản bị tạm khóa", code: 5 };
+    }
     return {
       error: "Internal Server Error",
-      code: 3,
+      code: 4,
     };
   }
 }
