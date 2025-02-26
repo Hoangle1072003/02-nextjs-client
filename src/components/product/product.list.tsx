@@ -1,22 +1,11 @@
-<<<<<<< HEAD
 'use client';
 import AppCarousel from '@/components/layout/app.carousel';
-import { Card, Col, Row, Skeleton, Tooltip } from 'antd';
+import { Card, Col, Empty, Row, Skeleton, Tooltip } from 'antd';
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { converSlugUrl } from '@/utils/api';
 import useSWR from 'swr';
-=======
-"use client";
-import AppCarousel from "@/components/layout/app.carousel";
-import { Card, Col, Empty, Row, Skeleton, Tooltip } from "antd";
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { converSlugUrl } from "@/utils/api";
-import useSWR from "swr";
->>>>>>> f4c17dc14254c7aa80a332192c5ea653e57ad67b
 
 const ProductList = () => {
   const fetcher = (url: string) => fetch(url).then((r) => r.json());
@@ -44,11 +33,12 @@ const ProductList = () => {
       <>
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
-          description="No products found."
+          description='No products found.'
         />
       </>
     );
   }
+
   return (
     <>
       <AppCarousel />

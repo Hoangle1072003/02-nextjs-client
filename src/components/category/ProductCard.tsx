@@ -27,7 +27,6 @@ const ProductCard = ({ product }: { product: any }) => {
           }
           onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
         >
-          {/* Product Image */}
           <div style={{ position: 'relative', textAlign: 'center' }}>
             <Image
               src={product.varients[0].image}
@@ -37,8 +36,6 @@ const ProductCard = ({ product }: { product: any }) => {
               style={{ objectFit: 'contain', borderRadius: '10px' }}
             />
           </div>
-
-          {/* Product Info */}
           <Tooltip title={product.name}>
             <div
               style={{
@@ -54,8 +51,6 @@ const ProductCard = ({ product }: { product: any }) => {
               {product.name}
             </div>
           </Tooltip>
-
-          {/* Product Price */}
           <div
             style={{
               display: 'flex',
@@ -77,8 +72,6 @@ const ProductCard = ({ product }: { product: any }) => {
               }).format(product.varients[0].price)}
             </span>
           </div>
-
-          {/* Rating and Delivery */}
           <div
             style={{
               marginTop: '8px',

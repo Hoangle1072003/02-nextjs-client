@@ -1,71 +1,103 @@
+'use client';
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Row, Col, Pagination, Select, Input } from 'antd';
 import ProductCard from './ProductCard';
-import { getAllProducts } from '@/utils/actions';
+import { getPaginatedProducts } from '@/utils/actions';
+import { useSearchParams } from 'next/navigation';
 
 const { Option } = Select;
 
 const ProductGrid = ({ products }: { products: any[] }) => {
-  const [showAll, setShowAll] = useState(false);
-  const [pageNumber, setPageNumber] = useState(1);
+  const searchParams = useSearchParams();
+  const keyword = searchParams.get('keyword') || '';
+  const [showAll, setShowAll] = useState(!!keyword);
+  const [pageNumber, setPageNumber] = useState(0);
   const [paginatedProducts, setPaginatedProducts] = useState<any[]>([]);
   const [totalProducts, setTotalProducts] = useState<number>(0);
   const [sortOption, setSortOption] = useState<string>('name-asc');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(keyword);
 
   useEffect(() => {
-    if (showAll) {
-      const fetchAllProducts = async () => {
-        try {
-          const data = await getAllProducts();
-          if (Array.isArray(data.data)) {
-            setPaginatedProducts(data.data);
-            setTotalProducts(data.data.length);
-          } else {
-            setPaginatedProducts([]);
-            setTotalProducts(0);
-          }
-        } catch (error) {
-          console.error('Lỗi khi lấy tất cả sản phẩm:', error);
+    setSearchQuery(keyword);
+    const fetchProducts = async () => {
+      try {
+        let sortBy = '';
+        let dir = '';
+        switch (sortOption) {
+          case 'name-asc':
+            sortBy = 'name';
+            dir = 'asc';
+            break;
+          case 'name-desc':
+            sortBy = 'name';
+            dir = 'desc';
+            break;
+          case 'price-asc':
+            sortBy = 'price';
+            dir = 'asc';
+            break;
+          case 'price-desc':
+            sortBy = 'price';
+            dir = 'desc';
+            break;
         }
-      };
-      fetchAllProducts();
+
+        const response = await getPaginatedProducts(
+          pageNumber,
+          12,
+          sortBy,
+          dir,
+          0,
+          10000,
+          keyword || undefined
+        );
+
+        console.log('Fetched data:', response);
+
+        if (response?.data?.products) {
+          let sortedProducts = response.data.products;
+          if (keyword && sortBy === 'price') {
+            sortedProducts = sortedProducts.sort((a, b) =>
+              dir === 'asc'
+                ? a.varients[0].price - b.varients[0].price
+                : b.varients[0].price - a.varients[0].price
+            );
+          }
+          setPaginatedProducts(sortedProducts);
+          setTotalProducts(response.data.totalElements);
+          console.log('Total Products:', response.data.totalElements);
+          console.log('Paginated Products:', sortedProducts);
+        } else {
+          setPaginatedProducts([]);
+          setTotalProducts(0);
+        }
+      } catch (error) {
+        console.error('Lỗi khi lấy sản phẩm:', error);
+      }
+    };
+
+    if (showAll || keyword) {
+      fetchProducts();
     }
-  }, [showAll]);
+  }, [showAll, pageNumber, sortOption, keyword]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
   };
 
-  // Lọc các sản phẩm dựa trên truy vấn tìm kiếm
   const filteredProducts = useMemo(() => {
-    return paginatedProducts.filter((product) =>
+    const result = paginatedProducts.filter((product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
+    console.log('Filtered Products:', result);
+    return result;
   }, [paginatedProducts, searchQuery]);
 
-  const sortedProducts = useMemo(() => {
-    let sorted = [...filteredProducts];
-    if (sortOption === 'price-asc') {
-      sorted.sort((a, b) => a.price - b.price);
-    } else if (sortOption === 'price-desc') {
-      sorted.sort((a, b) => b.price - a.price);
-    } else if (sortOption === 'name-asc') {
-      sorted.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortOption === 'name-desc') {
-      sorted.sort((a, b) => b.name.localeCompare(a.name));
-    }
-    return sorted;
-  }, [filteredProducts, sortOption]);
-
-  const paginatedData = useMemo(() => {
-    return sortedProducts.slice((pageNumber - 1) * 12, pageNumber * 12);
-  }, [sortedProducts, pageNumber]);
-
-  const displayedProducts = showAll ? paginatedData : products;
+  const displayedProducts = showAll || keyword ? filteredProducts : products;
 
   const handlePageChange = (page: number) => {
-    setPageNumber(page);
+    setPageNumber(page - 1);
   };
 
   return (
@@ -89,13 +121,13 @@ const ProductGrid = ({ products }: { products: any[] }) => {
           onClick={(e) => {
             e.preventDefault();
             setShowAll(true);
+            console.log('Show All:', true);
           }}
           style={{ color: '#1890ff', fontSize: '14px' }}
         >
           Xem tất cả
         </a>
       </div>
-
       <div
         style={{
           marginBottom: '20px',
@@ -120,7 +152,6 @@ const ProductGrid = ({ products }: { products: any[] }) => {
           <Option value='price-desc'>Sắp xếp theo giá (Giảm dần)</Option>
         </Select>
       </div>
-
       <Row gutter={[16, 16]} justify='start'>
         {Array.isArray(displayedProducts) &&
           displayedProducts.map((product: any, index: number) => (
@@ -129,18 +160,16 @@ const ProductGrid = ({ products }: { products: any[] }) => {
             </Col>
           ))}
       </Row>
-
-      {showAll && totalProducts > 0 && (
+      {(showAll || keyword) && totalProducts > 0 && (
         <div
           style={{
             marginTop: '20px',
             display: 'flex',
-            justifyContent: 'center',
-            textAlign: 'center'
+            justifyContent: 'center'
           }}
         >
           <Pagination
-            current={pageNumber}
+            current={pageNumber + 1}
             total={totalProducts}
             pageSize={12}
             onChange={handlePageChange}

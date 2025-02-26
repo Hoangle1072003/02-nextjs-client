@@ -59,31 +59,6 @@ export async function getCategoryById(id: string) {
   return res;
 }
 
-export const getPaginatedProducts = async (
-  pageNumber: number,
-  pageSize: number,
-  sortBy: string,
-  sortDir: string,
-  minPrice?: number,
-  maxPrice?: number
-) => {
-  const response = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_API_URL
-    }product-service/api/v1/products/allProductPage?pageNumber=${pageNumber}&pageSize=${pageSize}&sortBy=${sortBy}&dir=${sortDir}&minPrice=${
-      minPrice || ''
-    }&maxPrice=${maxPrice || ''}`,
-    {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    }
-  );
-  const data = await response.json();
-  return data;
-};
-
 export const getAllProducts = async () => {
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products`,
@@ -96,4 +71,55 @@ export const getAllProducts = async () => {
   );
   const data = await response.json();
   return data;
+};
+
+export const getPaginatedProducts = async (
+  page: number,
+  size: number,
+  sortBy: string,
+  dir: string,
+  minPrice: number,
+  maxPrice: number,
+  keyword?: string
+) => {
+  try {
+    const baseUrl = `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products`;
+    const url = keyword ? `${baseUrl}/search` : `${baseUrl}/allProductPage`;
+    const params: any = {
+      pageNumber: page,
+      pageSize: size,
+      sortBy: sortBy || '',
+      dir: dir || 'asc',
+      minPrice: minPrice || '',
+      maxPrice: maxPrice || ''
+    };
+
+    if (keyword) {
+      params.keyword = keyword;
+      params.price = maxPrice !== 10000 ? maxPrice : null;
+      delete params.minPrice;
+      delete params.maxPrice;
+    }
+
+    const response = await sendRequest<any>({
+      url,
+      method: 'GET',
+      queryParams: params
+    });
+
+    console.log('API URL:', url);
+    console.log('Params:', params);
+    console.log('API Response:', response);
+
+    return {
+      data: {
+        products: response.data?.products || [],
+        totalElements:
+          response.data?.totalElements || response.data?.products?.length || 0
+      }
+    };
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return { data: { products: [], totalElements: 0 } };
+  }
 };
