@@ -10,8 +10,13 @@ export async function authenticate(username: string, password: string) {
       redirect: false
     });
 
+    if (r?.error) {
+      console.error("Login Error:", r);
+    }
+
     return r;
   } catch (error) {
+<<<<<<< HEAD
     if ((error as any).name === 'InvalidEmailPasswordError') {
       return { error: error.type as any, code: 1 };
     } else if ((error as any).name === 'InActiveAccountError') {
@@ -21,7 +26,27 @@ export async function authenticate(username: string, password: string) {
         error: 'Internal Server Error',
         code: 3
       };
+=======
+    console.error("Catch Error:", error);
+
+    if (error?.message?.includes("User account is not activated")) {
+      return { error: "Tài khoản chưa được kích hoạt", code: 2 };
+>>>>>>> e367a9a7dacd4f0e6491cff5741b6c4f92eeb191
     }
+
+    if (error?.message?.includes("Bad credentials")) {
+      return { error: "Email or mật khẩu không đúng", code: 1 };
+    }
+    if (error?.message?.includes("User account has been deleted")) {
+      return { error: "Tài khoản đã bị xóa", code: 3 };
+    }
+    if (error?.message?.includes("User account is suspended")) {
+      return { error: "Tài khoản bị tạm khóa", code: 5 };
+    }
+    return {
+      error: "Internal Server Error",
+      code: 4,
+    };
   }
 }
 

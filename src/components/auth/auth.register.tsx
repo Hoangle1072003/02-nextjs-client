@@ -33,7 +33,7 @@ const AuthRegister = () => {
           messageApi.success(
             "Đăng ký thành công - vui lòng kích hoạt tài khoản qua email"
           );
-          router.push("/auth/login");
+          router.push("/guest/auth/login");
         } else {
           messageApi.error("Email đã tồn tại");
         }

@@ -10,18 +10,7 @@ const CustomerPageLayout: React.FC<CustomerPageLayoutProps> = ({
 }) => {
   return (
     <div>
-      <CustomerSider>
-        <span
-          style={{
-            marginBottom: "1rem",
-            color: "grey",
-            fontSize: "1rem",
-          }}
-        >
-          Thông tin tài khoản
-        </span>
-        {children}
-      </CustomerSider>
+      <CustomerSider>{children}</CustomerSider>
     </div>
   );
 };

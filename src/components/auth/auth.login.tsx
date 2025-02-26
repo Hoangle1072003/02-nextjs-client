@@ -9,17 +9,25 @@ import AuthStep from "./auth.active";
 import { useDispatch } from "react-redux";
 import { setUser } from "@/lib/features/auth/authSlice";
 import { signIn } from "next-auth/react";
+import { set } from "nprogress";
+import AuthSuspense from "./auth.suspend";
 
 const AuthLogin = () => {
   const [messageApi, contextHolder] = message.useMessage();
   const [loadings, setLoadings] = useState<boolean[]>([]);
   const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [openSuspend, setOpenSuspend] = useState(false);
   const dispatch = useDispatch();
 
   const handleCancel = () => {
     console.log("Clicked cancel button");
     setOpen(false);
+  };
+
+  const handleCancelSuspend = () => {
+    console.log("Clicked cancel button");
+    setOpenSuspend(false);
   };
 
   const onFinish = async (values: any) => {
@@ -29,24 +37,23 @@ const AuthLogin = () => {
 
     try {
       const res = await authenticate(username, password);
-      // if (res?.error && res?.code === 2) {
-      //   dispatch(setUser({ email: username }));
-      //   console.log("res.error", res);
-      //   messageApi.error(res.error);
-      //   setOpen(true);
-      // } else {
-      //   messageApi.success("Login successfully!");
+      console.log("res", res);
 
-      //   setTimeout(() => {
-      //     router.push("/");
-      //   }, 2000);
-      // }
       if (res?.error) {
         if (res?.code === 2) {
           dispatch(setUser({ email: username }));
           setOpen(true);
         }
         messageApi.error(res.error);
+        if (res?.code === 5) {
+          console.log("res.error", res);
+          setOpenSuspend(true);
+        }
+        if (res?.code === 3) {
+          alert("Tài khoản đã bị xóa");
+        }
+      } else if (res?.code === 1) {
+        console.log("res.error", res);
       } else {
         messageApi.success("Login successfully!");
 
@@ -68,13 +75,6 @@ const AuthLogin = () => {
       redirect: false,
     });
   };
-
-  // const handleLoginGithub = async () => {
-  //   await signIn("github", {
-  //     callbackUrl: "/",
-  //     redirect: false,
-  //   });
-  // };
 
   return (
     <>
@@ -184,6 +184,14 @@ const AuthLogin = () => {
         footer
       >
         <AuthStep />
+      </Modal>
+      <Modal
+        title="Bạn có muốn kích hoạt tài khoản không?"
+        open={openSuspend}
+        onCancel={handleCancelSuspend}
+        footer
+      >
+        <AuthSuspense />
       </Modal>
     </>
   );
