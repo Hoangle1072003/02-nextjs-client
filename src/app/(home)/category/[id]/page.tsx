@@ -2,8 +2,9 @@ import React from 'react';
 import axios from 'axios';
 import { CategoryList, getCategoryById } from '@/utils/actions';
 import AppSider from '@/components/layout/app.sider';
-import { Layout } from 'antd';
+import { Breadcrumb, Layout } from 'antd';
 import CategoryProductList from '@/components/category/CategoryProductList';
+import Link from 'next/link';
 
 const CategoryPage = async ({ params }: { params: { id: string } }) => {
   const { id } = await params;
@@ -21,20 +22,29 @@ const CategoryPage = async ({ params }: { params: { id: string } }) => {
     const categories = await CategoryList();
 
     return (
-      <Layout
-        style={{
-          width: '1440px',
-          margin: '24px auto',
-          maxWidth: '1440px',
-          minHeight: '100vh'
-        }}
-      >
-        <AppSider categories={categories.data || []} />
-        <CategoryProductList products={products} productName={categoryName} />
-      </Layout>
+      <div>
+        <Breadcrumb
+          items={[
+            { title: <Link href='/'>Trang chủ</Link> },
+            { title: categoryName }
+          ]}
+        />
+        <Layout
+          style={{
+            width: '1440px',
+            margin: '24px auto',
+            maxWidth: '1440px',
+            minHeight: '100vh'
+          }}
+        >
+          <AppSider categories={categories.data || []} />
+          <CategoryProductList products={products} productName={categoryName} />
+        </Layout>
+      </div>
     );
-  } catch (error: any) {
-    return <div>Error loading products</div>;
+  } catch (error) {
+    console.error('Error fetching category data:', error);
+    return <div>Error loading category data.</div>;
   }
 };
 

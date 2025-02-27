@@ -90,7 +90,6 @@ const ProductGrid = ({ products }: { products: any[] }) => {
     const result = paginatedProducts.filter((product) =>
       product.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-    console.log('Filtered Products:', result);
     return result;
   }, [paginatedProducts, searchQuery]);
 
@@ -112,10 +111,29 @@ const ProductGrid = ({ products }: { products: any[] }) => {
       <div
         style={{
           display: 'flex',
-          justifyContent: 'flex-end',
-          marginBottom: '20px'
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+          alignItems: 'center'
         }}
       >
+        <div
+          style={{
+            marginBottom: '20px',
+            display: 'flex',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Select
+            value={sortOption}
+            onChange={(value) => setSortOption(value)}
+            style={{ width: '200px' }}
+          >
+            <Option value='name-asc'>Sắp xếp theo tên (A-Z)</Option>
+            <Option value='name-desc'>Sắp xếp theo tên (Z-A)</Option>
+            <Option value='price-asc'>Sắp xếp theo giá (Tăng dần)</Option>
+            <Option value='price-desc'>Sắp xếp theo giá (Giảm dần)</Option>
+          </Select>
+        </div>
         <a
           href='#'
           onClick={(e) => {
@@ -127,30 +145,6 @@ const ProductGrid = ({ products }: { products: any[] }) => {
         >
           Xem tất cả
         </a>
-      </div>
-      <div
-        style={{
-          marginBottom: '20px',
-          display: 'flex',
-          justifyContent: 'space-between'
-        }}
-      >
-        <Input
-          placeholder='Tìm kiếm sản phẩm...'
-          value={searchQuery}
-          onChange={handleSearchChange}
-          style={{ width: '200px' }}
-        />
-        <Select
-          value={sortOption}
-          onChange={(value) => setSortOption(value)}
-          style={{ width: '200px' }}
-        >
-          <Option value='name-asc'>Sắp xếp theo tên (A-Z)</Option>
-          <Option value='name-desc'>Sắp xếp theo tên (Z-A)</Option>
-          <Option value='price-asc'>Sắp xếp theo giá (Tăng dần)</Option>
-          <Option value='price-desc'>Sắp xếp theo giá (Giảm dần)</Option>
-        </Select>
       </div>
       <Row gutter={[16, 16]} justify='start'>
         {Array.isArray(displayedProducts) &&
