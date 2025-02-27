@@ -27,6 +27,8 @@ const AuthRegister = () => {
           body: JSON.stringify({ email, password, name }),
         }
       );
+      console.log("res register", res);
+
       setTimeout(async () => {
         setLoadings([false]);
         if (res.status === 201) {
