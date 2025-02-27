@@ -38,19 +38,29 @@ export async function authenticate(username: string, password: string) {
   }
 }
 
-export async function ProductDetailsById(productId: string) {
+export async function ProductDetailsById(
+  userId: string | null,
+  productId: string
+) {
+  console.log("ProductDetailsById", userId, productId);
+
   const temp = productId.replace(".html", "");
-
   const parts = temp.split("-");
-
   const id = parts.at(-1);
 
-  const res = await sendRequest<IBackendRes<any>>({
-    url: `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products/${id}`,
+  if (!id) {
+    throw new Error("Invalid product ID");
+  }
+
+  const finalUserId = userId ?? "null";
+  const url = `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products/${finalUserId}/${id}`;
+
+  console.log("Final API URL:", url);
+
+  return sendRequest<IBackendRes<any>>({
+    url,
     method: "GET",
   });
-
-  return res;
 }
 
 // category list

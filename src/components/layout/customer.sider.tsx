@@ -50,6 +50,12 @@ const CustomerSider: React.FC<CustomerSiderProps> = ({ children }) => {
     {
       key: "5",
       icon: <FileTextOutlined />,
+      label: "Sản phẩm đã xem",
+      path: "/home/customer/viewed",
+    },
+    {
+      key: "6",
+      icon: <FileTextOutlined />,
       label: "Xuất hóa đơn",
       path: "/home/customer/invoice",
     },

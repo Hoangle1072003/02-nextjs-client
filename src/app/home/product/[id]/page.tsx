@@ -4,9 +4,14 @@ import ProductDetails from "@/components/product/product.details";
 import { auth } from "@/auth";
 
 const ProductDetailsPage = async ({ params }: { params: { id: string } }) => {
-  const { id } = await params;
-  const res = await ProductDetailsById(id);
   const session = await auth();
+  const { id } = await params;
+  let userId: string | null = null;
+  if (session?.user?.id) {
+    userId = session.user.id;
+  }
+
+  const res = await ProductDetailsById(userId, id);
 
   return (
     <>
