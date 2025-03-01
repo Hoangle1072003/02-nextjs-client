@@ -48,7 +48,9 @@ const AppHeader = (prop: IProps) => {
 
   const handleSearch = () => {
     if (searchTerm.trim()) {
-      router.push(`/product/search?keyword=${encodeURIComponent(searchTerm)}`);
+      router.push(
+        `/home/product/search?keyword=${encodeURIComponent(searchTerm)}`
+      );
     }
   };
 
@@ -174,7 +176,7 @@ const AppHeader = (prop: IProps) => {
               }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              onPressEnter={handleSearch} // Xử lý khi nhấn Enter
+              onPressEnter={handleSearch}
             />
 
             {/* Menu Options */}

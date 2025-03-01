@@ -10,7 +10,7 @@ const AppSider = ({ categories }: { categories: ICategory[] }) => {
   const menuItems = categories.map((category) => ({
     key: category.id,
     icon: <AppstoreAddOutlined />,
-    label: <Link href={`/category/${category.id}`}>{category.name}</Link>
+    label: <Link href={`/home/category/${category.id}`}>{category.name}</Link>
   }));
 
   return (
