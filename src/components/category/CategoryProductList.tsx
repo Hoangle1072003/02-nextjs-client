@@ -1,11 +1,11 @@
-'use client';
-import React from 'react';
-import HeaderSection from './HeaderSection';
-import ProductGrid from './ProductGrid';
+"use client";
+import React from "react";
+import HeaderSection from "./HeaderSection";
+import ProductGrid from "./ProductGrid";
 
 const CategoryProductList = ({
   products,
-  productName
+  productName,
 }: {
   products: any[];
   productName: string;
@@ -15,8 +15,8 @@ const CategoryProductList = ({
   }
 
   return (
-    <div style={{ width: '100%', padding: '10px' }}>
-      <HeaderSection title={productName || 'All Products'} />
+    <div style={{ padding: "10px" }}>
+      <HeaderSection title={productName || "All Products"} />
       <ProductGrid products={products} />
     </div>
   );
