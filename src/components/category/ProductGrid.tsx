@@ -66,8 +66,6 @@ const ProductGrid = ({ products }: { products: any[] }) => {
           }
           setPaginatedProducts(sortedProducts);
           setTotalProducts(response.data.totalElements);
-          console.log('Total Products:', response.data.totalElements);
-          console.log('Paginated Products:', sortedProducts);
         } else {
           setPaginatedProducts([]);
           setTotalProducts(0);
@@ -81,10 +79,6 @@ const ProductGrid = ({ products }: { products: any[] }) => {
       fetchProducts();
     }
   }, [showAll, pageNumber, sortOption, keyword]);
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-  };
 
   const filteredProducts = useMemo(() => {
     const result = paginatedProducts.filter((product) =>
