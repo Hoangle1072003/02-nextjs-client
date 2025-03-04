@@ -7,7 +7,7 @@ import Image from "next/image";
 const ProductCard = ({ product }: { product: any }) => {
   const generateProductLink = (product: any) => {
     const slug = product.name.toLowerCase().replace(/\s+/g, "-");
-    return `/product/${slug}-${product.id}.html`;
+    return `/home/product/${slug}-${product.id}.html`;
   };
 
   return (
