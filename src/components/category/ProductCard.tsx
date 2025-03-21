@@ -5,14 +5,16 @@ import Link from 'next/link';
 import Image from 'next/image';
 
 const ProductCard = ({ product }: { product: any }) => {
-  const generateProductLink = (product: any) => {
-    const slug = product.name.toLowerCase().replace(/\s+/g, '-');
-    return `/product/${slug}-${product.id}.html`;
+  const converSlugUrl = (name: string) => {
+    return name.toLowerCase().replace(/\s+/g, '-');
   };
 
   return (
     <div>
-      <Link href={generateProductLink(product)} passHref>
+      <Link
+        href={`/home/product/${converSlugUrl(product.name)}-${product.id}.html`}
+        passHref
+      >
         <Card
           hoverable
           style={{
