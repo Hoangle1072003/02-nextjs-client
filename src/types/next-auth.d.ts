@@ -10,6 +10,8 @@ interface IUser {
   image?: string;
   role: IRole;
   sub?: string;
+  expires_at?: number;
+  refresh_token?: string;
 }
 
 interface IRole {

@@ -17,9 +17,9 @@ const AppLayout: React.FC<AppLayoutProps> = async ({ children }) => {
       <AppHeader session={session} />
       <Layout
         style={{
-          width: "1440px",
+          width: "1240px",
           margin: "24px auto",
-          maxWidth: "1440px",
+          maxWidth: "1240px",
           minHeight: "50vh",
         }}
       >

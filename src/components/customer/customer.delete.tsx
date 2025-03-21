@@ -61,7 +61,11 @@ const CustomerDelete = (props: any) => {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session?.user?.access_token}`,
         },
-        body: JSON.stringify({ email: session?.user?.email, reason: reason }),
+        body: JSON.stringify({
+          email: session?.user?.email,
+          reason: reason,
+          provider: session?.user?.provider,
+        }),
       }
     );
     if (res.ok) {
@@ -96,6 +100,7 @@ const CustomerDelete = (props: any) => {
     const requestData = {
       email: session?.user?.email,
       reason: reasonText,
+      provider: session?.user?.provider,
     };
 
     setOtpSent(true);

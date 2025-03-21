@@ -33,6 +33,7 @@ const SuspendCustomer = (prop: any) => {
           },
           body: JSON.stringify({
             email: session?.user?.email,
+            provider: session?.user?.provider,
             password: password,
           }),
         }

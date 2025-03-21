@@ -37,7 +37,6 @@ const AuthLogin = () => {
 
     try {
       const res = await authenticate(username, password);
-      console.log("res", res);
 
       if (res?.error) {
         if (res?.code === 2) {

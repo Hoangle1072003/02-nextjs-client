@@ -1,26 +1,26 @@
-import { Layout } from 'antd';
-import AppSider from '@/components/layout/app.sider';
-import CategoryProductList from '@/components/category/CategoryProductList';
-import { CategoryList } from '@/utils/actions';
-import axios from 'axios';
+import { Layout } from "antd";
+import AppSider from "@/components/layout/app.sider";
+import CategoryProductList from "@/components/category/CategoryProductList";
+import { CategoryList } from "@/utils/actions";
+import axios from "axios";
 
 const SearchPage = async ({
-  searchParams
+  searchParams,
 }: {
   searchParams: { keyword?: string } | undefined;
 }) => {
-  const keyword = searchParams?.keyword || '';
+  const keyword = searchParams?.keyword || "";
   let products = [];
   let error = null;
 
   try {
     const apiUrl = `${process.env.NEXT_PUBLIC_API_URL}product-service/api/v1/products/search`;
     const response = await axios.get(apiUrl, {
-      params: { keyword }
+      params: { keyword },
     });
     products = response.data?.data?.products || [];
   } catch (err) {
-    error = 'Error loading search results';
+    error = "Error loading search results";
   }
 
   const categories = await CategoryList();
@@ -28,10 +28,10 @@ const SearchPage = async ({
   return (
     <Layout
       style={{
-        width: '1440px',
-        margin: '24px auto',
-        maxWidth: '1440px',
-        minHeight: '100vh'
+        width: "1240px",
+        margin: "24px auto",
+        maxWidth: "1240px",
+        minHeight: "100vh",
       }}
     >
       <AppSider categories={categories.data || []} />
