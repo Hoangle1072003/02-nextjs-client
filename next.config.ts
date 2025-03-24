@@ -1,29 +1,35 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "salt.tikicdn.com",
-        port: "",
-        search: "",
+        protocol: 'https',
+        hostname: 'salt.tikicdn.com',
+        port: '',
+        search: ''
       },
       {
-        protocol: "https",
-        hostname: "picsum.photos",
-        port: "",
-        search: "",
+        protocol: 'https',
+        hostname: 'picsum.photos',
+        port: '',
+        search: ''
       },
-    ],
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        port: '',
+        pathname: '/**'
+      }
+    ]
   },
-  output: "standalone",
+  output: 'standalone',
   eslint: {
-    ignoreDuringBuilds: true,
+    ignoreDuringBuilds: true
   },
   typescript: {
-    ignoreBuildErrors: true,
-  },
+    ignoreBuildErrors: true
+  }
 };
 
 export default nextConfig;

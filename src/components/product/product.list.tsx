@@ -21,7 +21,7 @@ const ProductList = () => {
 
   // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
-  const productsPerPage = 12;
+  const productsPerPage = 8;
 
   if (isLoading) {
     return <Skeleton />;
@@ -68,7 +68,7 @@ const ProductList = () => {
       >
         <Row gutter={[16, 16]} justify='start'>
           {currentProducts.map((product: IProduct, index: number) => (
-            <Col xs={24} sm={12} md={8} lg={6} xl={4} key={index}>
+            <Col xs={24} sm={12} md={8} lg={6} key={index}>
               <Link
                 href={`/home/product/${converSlugUrl(product.name)}-${
                   product.id
@@ -96,7 +96,7 @@ const ProductList = () => {
                       src={product.varients[0].image}
                       alt={product.name}
                       width={140}
-                      height={140}
+                      height={130}
                       style={{ objectFit: 'contain', borderRadius: '10px' }}
                     />
                   </div>
