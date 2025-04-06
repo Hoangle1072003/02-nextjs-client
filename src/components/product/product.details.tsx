@@ -20,8 +20,9 @@ interface IProps {
 const ProductDetails = (props: IProps) => {
   const { session, data, productId } = props;
   const [selectedVariant, setSelectedVariant] = useState(data?.varients[0]);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState('1');
   const pathname = usePathname();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const pathSegments = pathname.split('/').filter(Boolean);
   const productPath = pathSegments[pathSegments.length - 1];
   const productName = productPath.replace(/-\w+\.html$/, '');
@@ -35,14 +36,20 @@ const ProductDetails = (props: IProps) => {
 
   const handleVariantSelect = (variant: any) => {
     setSelectedVariant(variant);
-    setQuantity(1);
+    setQuantity('1');
   };
 
   const handleToCart = () => {
-    console.log(session.user.access_token);
+    const numQuantity = parseInt(quantity, 10) || 0;
+    if (numQuantity > selectedVariant.stock) {
+      setErrorMessage(
+        `Số lượng còn lại của sản phẩm này là ${selectedVariant.stock}`
+      );
+      return;
+    }
 
     const productData = {
-      quantity: quantity,
+      quantity: numQuantity,
       productVariantId: selectedVariant.id,
       userId: session?.user?.id,
       productId: productId
@@ -64,11 +71,43 @@ const ProductDetails = (props: IProps) => {
       });
   };
 
-  const handleQuantityChange = (variantId: string, newQuantity: number) => {
+  const handleQuantityChange = (action: 'increase' | 'decrease') => {
+    const currentQuantity = parseInt(quantity, 10) || 0;
+    let newQuantity;
+
+    if (action === 'increase') {
+      newQuantity = currentQuantity + 1;
+    } else if (action === 'decrease') {
+      newQuantity = currentQuantity - 1;
+    }
     if (newQuantity < 1) {
+      setQuantity('1');
       return;
     }
-    setQuantity(newQuantity);
+    setErrorMessage(null);
+    setQuantity(newQuantity.toString());
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    if (value === '' || /^\d*$/.test(value)) {
+      setQuantity(value);
+      setErrorMessage(null);
+    }
+  };
+
+  const handleInputBlur = () => {
+    const numQuantity = parseInt(quantity, 10);
+    if (isNaN(numQuantity) || numQuantity < 1) {
+      setQuantity('1');
+    } else {
+      setQuantity(numQuantity.toString());
+    }
+  };
+
+  const calculateSubtotal = () => {
+    const numQuantity = parseInt(quantity, 10) || 0;
+    return (selectedVariant?.price * numQuantity).toFixed(2);
   };
 
   return (
@@ -109,26 +148,24 @@ const ProductDetails = (props: IProps) => {
                 marginTop: '20px'
               }}
             >
-              {data?.varients.map((variant: any) => {
-                return (
-                  <Image
-                    onClick={() => setSelectedVariant(variant)}
-                    key={variant.id}
-                    src={variant.image}
-                    alt={data.name}
-                    width={100}
-                    height={100}
-                    style={{
-                      border:
-                        selectedVariant.id === variant.id
-                          ? '2px solid #3498db'
-                          : '1px solid #f0f0f0',
-                      borderRadius: '8px',
-                      cursor: 'pointer'
-                    }}
-                  />
-                );
-              })}
+              {data?.varients.map((variant: any) => (
+                <Image
+                  onClick={() => setSelectedVariant(variant)}
+                  key={variant.id}
+                  src={variant.image}
+                  alt={data.name}
+                  width={100}
+                  height={100}
+                  style={{
+                    border:
+                      selectedVariant.id === variant.id
+                        ? '2px solid #3498db'
+                        : '1px solid #f0f0f0',
+                    borderRadius: '8px',
+                    cursor: 'pointer'
+                  }}
+                />
+              ))}
             </div>
             {/* Chat AI - Xem them san pham - draw*/}
             <div
@@ -194,7 +231,6 @@ const ProductDetails = (props: IProps) => {
                   {selectedVariant?.price}đ
                 </p>
               </div>
-
               {/* Variant Cards */}
               <Row gutter={[16, 16]}>
                 {data?.varients.map((variant: any) => (
@@ -213,20 +249,13 @@ const ProductDetails = (props: IProps) => {
                         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)'
                       }}
                     >
-                      <div>
-                        <h4 style={{ fontSize: '13px' }}>{variant?.name}</h4>
-                      </div>
+                      <h4 style={{ fontSize: '13px' }}>{variant?.name}</h4>
                     </div>
                   </Col>
                 ))}
               </Row>
             </Card>
-            <Card
-              style={{
-                marginTop: '20px',
-                borderRadius: '10px'
-              }}
-            >
+            <Card style={{ marginTop: '20px', borderRadius: '10px' }}>
               <h1
                 style={{
                   color: 'rgb(39, 39, 42)',
@@ -252,27 +281,18 @@ const ProductDetails = (props: IProps) => {
                       paddingBottom: '8px'
                     }}
                   >
-                    <div>
-                      <span style={{ color: 'rgb(128, 128, 137)' }}>
-                        {spec.k}
-                      </span>
-                    </div>
-                    <div>
-                      <span>
-                        {spec.v} {spec.u !== 'String' ? spec.u : ''}
-                      </span>
-                    </div>
+                    <span style={{ color: 'rgb(128, 128, 137)' }}>
+                      {spec.k}
+                    </span>
+                    <span>
+                      {spec.v} {spec.u !== 'String' ? spec.u : ''}
+                    </span>
                   </div>
                 ))}
               </div>
             </Card>
             {/* Product Description */}
-            <Card
-              style={{
-                marginTop: '20px',
-                borderRadius: '10px'
-              }}
-            >
+            <Card style={{ marginTop: '20px', borderRadius: '10px' }}>
               <h1
                 style={{
                   color: 'rgb(39, 39, 42)',
@@ -290,6 +310,7 @@ const ProductDetails = (props: IProps) => {
               </div>
             </Card>
           </Col>
+
           {/* Quantity and Cart Column */}
           <Col xs={24} md={10} lg={8}>
             <Card>
@@ -318,18 +339,17 @@ const ProductDetails = (props: IProps) => {
                 <MinusSquareOutlined
                   style={{
                     fontSize: '18px',
-                    cursor: quantity === 1 ? 'not-allowed' : 'pointer',
-                    color: quantity === 1 ? '#d9d9d9' : 'inherit'
+                    cursor:
+                      parseInt(quantity, 10) <= 1 ? 'not-allowed' : 'pointer',
+                    color: parseInt(quantity, 10) <= 1 ? '#d9d9d9' : 'inherit'
                   }}
-                  disabled={quantity === 1}
-                  onClick={() =>
-                    handleQuantityChange(selectedVariant.id, quantity - 1)
-                  }
+                  onClick={() => handleQuantityChange('decrease')}
                 />
-
                 <input
-                  type='number'
+                  type='text'
                   value={quantity}
+                  onChange={handleInputChange}
+                  onBlur={handleInputBlur}
                   style={{
                     width: '40px',
                     height: '32px',
@@ -338,21 +358,22 @@ const ProductDetails = (props: IProps) => {
                     borderRadius: '4px',
                     fontSize: '14px'
                   }}
-                  readOnly
                 />
-
                 {/* Increase Quantity */}
                 <PlusSquareOutlined
                   style={{
                     fontSize: '18px',
                     cursor: 'pointer'
                   }}
-                  onClick={() =>
-                    handleQuantityChange(selectedVariant.id, quantity + 1)
-                  }
+                  onClick={() => handleQuantityChange('increase')}
                 />
               </div>
 
+              {errorMessage && (
+                <p style={{ color: 'red', marginBottom: '10px' }}>
+                  {errorMessage}
+                </p>
+              )}
               {/* Subtotal */}
               <div>
                 <h1
@@ -367,12 +388,7 @@ const ProductDetails = (props: IProps) => {
                 >
                   Tạm tính
                 </h1>
-                <div
-                  style={{
-                    marginTop: '20px',
-                    marginBottom: '20px'
-                  }}
-                >
+                <div style={{ marginTop: '20px', marginBottom: '20px' }}>
                   <p
                     style={{
                       fontSize: '24px',
@@ -380,7 +396,7 @@ const ProductDetails = (props: IProps) => {
                       lineHeight: '150%'
                     }}
                   >
-                    {(selectedVariant?.price * quantity).toFixed(2)}đ
+                    {calculateSubtotal()}đ
                   </p>
                 </div>
               </div>
@@ -403,8 +419,6 @@ const ProductDetails = (props: IProps) => {
                 >
                   Mua ngay
                 </Button>
-
-                {/* Add to Cart button */}
                 <Button
                   type='default'
                   style={{
