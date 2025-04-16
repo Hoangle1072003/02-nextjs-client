@@ -1,7 +1,7 @@
-import { ProductDetailsById } from "@/utils/actions";
-import ProductDetails from "@/components/product/product.details";
+import { ProductDetailsById } from '@/utils/actions';
+import ProductDetails from '@/components/product/product.details';
 
-import { auth } from "@/auth";
+import { auth } from '@/auth';
 
 const ProductDetailsPage = async ({ params }: { params: { id: string } }) => {
   const session = await auth();

@@ -6,9 +6,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { converSlugUrl } from '@/utils/api';
 import useSWR from 'swr';
+import { useRouter } from 'next/navigation';
 
-const ProductList = () => {
+const ProductList = ({ sessions }) => {
   const fetcher = (url: string) => fetch(url).then((r) => r.json());
+  const router = useRouter();
+  const accessToken = sessions?.accessToken || null;
   const { data, error, isLoading } = useSWR(
     `http://localhost:9191/product-service/api/v1/products`,
     fetcher,
@@ -19,7 +22,6 @@ const ProductList = () => {
     }
   );
 
-  // State cho phân trang
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 8;
 
@@ -40,7 +42,15 @@ const ProductList = () => {
     );
   }
 
-  // Tính toán sản phẩm hiển thị cho trang hiện tại
+  const handleClick = (e: React.MouseEvent, url: string) => {
+    if (!accessToken) {
+      e.preventDefault();
+      router.push('/guest/auth/login');
+    } else {
+      router.push(url);
+    }
+  };
+
   const indexOfLastProduct = currentPage * productsPerPage;
   const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
   const currentProducts = data.data.slice(
@@ -49,7 +59,6 @@ const ProductList = () => {
   );
   const totalProducts = data.data.length;
 
-  // Xử lý thay đổi trang
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
   };
@@ -67,13 +76,21 @@ const ProductList = () => {
         }}
       >
         <Row gutter={[16, 16]} justify='start'>
-          {currentProducts.map((product: IProduct, index: number) => (
+          {currentProducts.map((product: any, index: number) => (
             <Col xs={24} sm={12} md={8} lg={6} key={index}>
               <Link
                 href={`/home/product/${converSlugUrl(product.name)}-${
                   product.id
                 }.html`}
                 passHref
+                onClick={(e) =>
+                  handleClick(
+                    e,
+                    `/home/product/${converSlugUrl(product.name)}-${
+                      product.id
+                    }.html`
+                  )
+                }
               >
                 <Card
                   hoverable
